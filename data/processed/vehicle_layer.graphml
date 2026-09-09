@@ -1,0 +1,248 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d0" for="edge" attr.name="relationship" attr.type="string" />
+  <graph edgedefault="undirected">
+    <node id="P145" />
+    <node id="V001" />
+    <node id="P059" />
+    <node id="V002" />
+    <node id="P065" />
+    <node id="V003" />
+    <node id="P080" />
+    <node id="V004" />
+    <node id="P024" />
+    <node id="V005" />
+    <node id="P052" />
+    <node id="V006" />
+    <node id="P043" />
+    <node id="V007" />
+    <node id="P030" />
+    <node id="V008" />
+    <node id="P102" />
+    <node id="V009" />
+    <node id="P004" />
+    <node id="V010" />
+    <node id="P068" />
+    <node id="V011" />
+    <node id="P060" />
+    <node id="V012" />
+    <node id="P017" />
+    <node id="V013" />
+    <node id="V014" />
+    <node id="P127" />
+    <node id="V015" />
+    <node id="P100" />
+    <node id="V016" />
+    <node id="P040" />
+    <node id="V017" />
+    <node id="P072" />
+    <node id="V018" />
+    <node id="P114" />
+    <node id="V019" />
+    <node id="P140" />
+    <node id="V020" />
+    <node id="P071" />
+    <node id="V021" />
+    <node id="P055" />
+    <node id="V022" />
+    <node id="P063" />
+    <node id="V023" />
+    <node id="P056" />
+    <node id="V024" />
+    <node id="V025" />
+    <node id="P045" />
+    <node id="V026" />
+    <node id="P092" />
+    <node id="V027" />
+    <node id="V028" />
+    <node id="V029" />
+    <node id="P116" />
+    <node id="V030" />
+    <node id="P118" />
+    <node id="V031" />
+    <node id="P103" />
+    <node id="V032" />
+    <node id="P019" />
+    <node id="V033" />
+    <node id="P033" />
+    <node id="V034" />
+    <node id="P117" />
+    <node id="V035" />
+    <node id="P142" />
+    <node id="V036" />
+    <node id="V037" />
+    <node id="P107" />
+    <node id="V038" />
+    <node id="P081" />
+    <node id="V039" />
+    <node id="P122" />
+    <node id="V040" />
+    <node id="P111" />
+    <node id="V041" />
+    <node id="P144" />
+    <node id="V042" />
+    <node id="P091" />
+    <node id="V043" />
+    <node id="V044" />
+    <node id="V045" />
+    <node id="P090" />
+    <node id="V046" />
+    <node id="P147" />
+    <node id="V047" />
+    <node id="P008" />
+    <node id="V048" />
+    <node id="V049" />
+    <node id="P018" />
+    <node id="V050" />
+    <edge source="P145" target="V001">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P059" target="V002">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P059" target="V037">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P065" target="V003">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P080" target="V004">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P080" target="V044">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P024" target="V005">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P052" target="V006">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P043" target="V007">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P030" target="V008">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P030" target="V014">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P102" target="V009">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P004" target="V010">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P068" target="V011">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P068" target="V028">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P060" target="V012">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P017" target="V013">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P017" target="V029">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P127" target="V015">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P100" target="V016">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P040" target="V017">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P040" target="V045">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P072" target="V018">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P114" target="V019">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P140" target="V020">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P071" target="V021">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P071" target="V025">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P055" target="V022">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P063" target="V023">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P056" target="V024">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P045" target="V026">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P092" target="V027">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P116" target="V030">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P118" target="V031">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P103" target="V032">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P019" target="V033">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P033" target="V034">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P117" target="V035">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P142" target="V036">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P107" target="V038">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P081" target="V039">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P122" target="V040">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P111" target="V041">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P144" target="V042">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P091" target="V043">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P090" target="V046">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P090" target="V049">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P147" target="V047">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P008" target="V048">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+    <edge source="P018" target="V050">
+      <data key="d0">OWNS_VEHICLE</data>
+    </edge>
+  </graph>
+</graphml>

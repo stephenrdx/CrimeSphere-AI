@@ -1,0 +1,893 @@
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+Criminal Network Analysis
+</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    margin: 0;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #f4f6f8;
+
+    color: #212529;
+
+}
+
+.header {
+
+    height: 70px;
+
+    background: #1f2937;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 0 25px;
+
+    font-size: 23px;
+
+    font-weight: bold;
+
+}
+
+.container {
+
+    display: flex;
+
+    height: calc(100vh - 70px);
+
+}
+
+.graph-area {
+
+    flex: 1;
+
+    background: white;
+
+    overflow: auto;
+
+    position: relative;
+
+}
+
+#graph {
+
+    width: 1400px;
+
+    height: 850px;
+
+}
+
+.side-panel {
+
+    width: 350px;
+
+    background: #ffffff;
+
+    border-left: 1px solid #ddd;
+
+    padding: 20px;
+
+    overflow-y: auto;
+
+}
+
+.side-panel h2 {
+
+    margin-top: 0;
+
+    font-size: 20px;
+
+}
+
+.info-box {
+
+    background: #f8f9fa;
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+
+    padding: 12px;
+
+    margin-bottom: 15px;
+
+}
+
+.info-row {
+
+    padding: 6px 0;
+
+    border-bottom: 1px solid #eee;
+
+    font-size: 13px;
+
+}
+
+.info-row:last-child {
+
+    border-bottom: none;
+
+}
+
+.info-key {
+
+    font-weight: bold;
+
+    color: #495057;
+
+}
+
+.legend {
+
+    position: absolute;
+
+    top: 15px;
+
+    left: 15px;
+
+    background: rgba(255,255,255,0.95);
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    border: 1px solid #ddd;
+
+    z-index: 10;
+
+}
+
+.legend-title {
+
+    font-weight: bold;
+
+    margin-bottom: 8px;
+
+}
+
+.legend-item {
+
+    display: flex;
+
+    align-items: center;
+
+    margin: 5px 0;
+
+    font-size: 13px;
+
+}
+
+.legend-color {
+
+    width: 14px;
+
+    height: 14px;
+
+    border-radius: 50%;
+
+    margin-right: 8px;
+
+}
+
+button {
+
+    border: none;
+
+    background: #343a40;
+
+    color: white;
+
+    padding: 8px 14px;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    margin-bottom: 10px;
+
+}
+
+button:hover {
+
+    background: #212529;
+
+}
+
+svg {
+
+    background: white;
+
+}
+
+.edge {
+
+    stroke-width: 0.7;
+
+    opacity: 0.45;
+
+}
+
+.node {
+
+    cursor: pointer;
+
+}
+
+.node:hover {
+
+    stroke: #000;
+
+    stroke-width: 2;
+
+}
+
+.node-label {
+
+    font-size: 10px;
+
+    pointer-events: none;
+
+    fill: #343a40;
+
+}
+
+.relationship {
+
+    font-size: 8px;
+
+    fill: #6c757d;
+
+    pointer-events: none;
+
+}
+
+.selected {
+
+    stroke: #000;
+
+    stroke-width: 3;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+    🔎 Criminal Network Analysis System
+
+</div>
+
+
+<div class="container">
+
+
+<div class="graph-area">
+
+
+<div class="legend">
+
+<div class="legend-title">
+Entity Types
+</div>
+
+<div class="legend-item">
+
+<div class="legend-color"
+style="background:#ff6b6b">
+</div>
+
+Person
+
+</div>
+
+<div class="legend-item">
+
+<div class="legend-color"
+style="background:#4dabf7">
+</div>
+
+Phone
+
+</div>
+
+<div class="legend-item">
+
+<div class="legend-color"
+style="background:#51cf66">
+</div>
+
+Vehicle
+
+</div>
+
+<div class="legend-item">
+
+<div class="legend-color"
+style="background:#ffd43b">
+</div>
+
+Bank Account
+
+</div>
+
+<div class="legend-item">
+
+<div class="legend-color"
+style="background:#cc5de8">
+</div>
+
+Organization
+
+</div>
+
+<div class="legend-item">
+
+<div class="legend-color"
+style="background:#20c997">
+</div>
+
+Location
+
+</div>
+
+<div class="legend-item">
+
+<div class="legend-color"
+style="background:#ff922b">
+</div>
+
+Case
+
+</div>
+
+<div class="legend-item">
+
+<div class="legend-color"
+style="background:#845ef7">
+</div>
+
+Device
+
+</div>
+
+</div>
+
+
+<svg
+id="graph"
+viewBox="0 0 1400 850"
+xmlns="http://www.w3.org/2000/svg">
+
+</svg>
+
+
+</div>
+
+
+<div class="side-panel">
+
+
+<h2>
+Node Information
+</h2>
+
+
+<button onclick="clearSelection()">
+Clear Selection
+</button>
+
+
+<div id="nodeInfo">
+
+Click a node to see information.
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+<script>
+
+
+const nodes = [{"id": "P001", "label": "P001", "type": "Person", "color": "#ff6b6b", "x": 1293.2611873673075, "y": 382.34372626234233, "information": {"type": "Person", "name": "Charita Kurian", "age": "58", "gender": "Male", "occupation": "Business", "city": "Rajahmundry", "id": "P001"}}, {"id": "P002", "label": "P002", "type": "Person", "color": "#ff6b6b", "x": 307.25760994604224, "y": 155.4934671396884, "information": {"type": "Person", "name": "Naveen Mital", "age": "35", "gender": "Male", "occupation": "Driver", "city": "Guntur", "id": "P002"}}, {"id": "P003", "label": "P003", "type": "Person", "color": "#ff6b6b", "x": 1070.2351425877787, "y": 159.23660087821293, "information": {"type": "Person", "name": "Yash Patla", "age": "24", "gender": "Male", "occupation": "Trader", "city": "Visakhapatnam", "id": "P003"}}, {"id": "P004", "label": "P004", "type": "Person", "color": "#ff6b6b", "x": 1159.4068597283228, "y": 668.5168452022397, "information": {"type": "Person", "name": "Mahika Dey", "age": "20", "gender": "Male", "occupation": "Business", "city": "Guntur", "id": "P004"}}, {"id": "P005", "label": "P005", "type": "Person", "color": "#ff6b6b", "x": 560.6193240763848, "y": 747.6714179848988, "information": {"type": "Person", "name": "Balhaar Mannan", "age": "32", "gender": "Male", "occupation": "Trader", "city": "Guntur", "id": "P005"}}, {"id": "P006", "label": "P006", "type": "Person", "color": "#ff6b6b", "x": 138.28978199465405, "y": 262.8540201733181, "information": {"type": "Person", "name": "Ridhi Rao", "age": "59", "gender": "Female", "occupation": "Driver", "city": "Visakhapatnam", "id": "P006"}}, {"id": "P007", "label": "P007", "type": "Person", "color": "#ff6b6b", "x": 318.11229114359946, "y": 707.0932386712033, "information": {"type": "Person", "name": "Anjali Mittal", "age": "55", "gender": "Female", "occupation": "Unknown", "city": "Vijayawada", "id": "P007"}}, {"id": "P008", "label": "P008", "type": "Person", "color": "#ff6b6b", "x": 797.1303662528683, "y": 759.3893306933751, "information": {"type": "Person", "name": "Mohammed Dhar", "age": "28", "gender": "Female", "occupation": "Employee", "city": "Hyderabad", "id": "P008"}}, {"id": "P009", "label": "P009", "type": "Person", "color": "#ff6b6b", "x": 205.9030369883273, "y": 232.4137316908716, "information": {"type": "Person", "name": "Veda Hari", "age": "27", "gender": "Male", "occupation": "Unknown", "city": "Hyderabad", "id": "P009"}}, {"id": "P010", "label": "P010", "type": "Person", "color": "#ff6b6b", "x": 118.7318193968069, "y": 558.6154871049707, "information": {"type": "Person", "name": "Jagat Sood", "age": "24", "gender": "Male", "occupation": "Student", "city": "Vijayawada", "id": "P010"}}, {"id": "P011", "label": "P011", "type": "Person", "color": "#ff6b6b", "x": 184.71694831413242, "y": 266.73051025405437, "information": {"type": "Person", "name": "Bhavna Singhal", "age": "40", "gender": "Female", "occupation": "Trader", "city": "Hyderabad", "id": "P011"}}, {"id": "P012", "label": "P012", "type": "Person", "color": "#ff6b6b", "x": 1264.229421513395, "y": 534.7729889631141, "information": {"type": "Person", "name": "Yashoda Mahajan", "age": "20", "gender": "Female", "occupation": "Trader", "city": "Vijayawada", "id": "P012"}}, {"id": "P013", "label": "P013", "type": "Person", "color": "#ff6b6b", "x": 689.3752339760829, "y": 568.4046607698033, "information": {"type": "Person", "name": "Simon Bhatt", "age": "42", "gender": "Male", "occupation": "Trader", "city": "Hyderabad", "id": "P013"}}, {"id": "P014", "label": "P014", "type": "Person", "color": "#ff6b6b", "x": 485.76706749670933, "y": 749.5317911080718, "information": {"type": "Person", "name": "Mugdha Deep", "age": "58", "gender": "Female", "occupation": "Trader", "city": "Guntur", "id": "P014"}}, {"id": "P015", "label": "P015", "type": "Person", "color": "#ff6b6b", "x": 280.43992691682746, "y": 676.6110997887454, "information": {"type": "Person", "name": "Timothy Dhar", "age": "22", "gender": "Male", "occupation": "Mechanic", "city": "Guntur", "id": "P015"}}, {"id": "P016", "label": "P016", "type": "Person", "color": "#ff6b6b", "x": 979.7357905403298, "y": 173.09785447333437, "information": {"type": "Person", "name": "Chandran Deshpande", "age": "36", "gender": "Male", "occupation": "Unknown", "city": "Guntur", "id": "P016"}}, {"id": "P017", "label": "P017", "type": "Person", "color": "#ff6b6b", "x": 1300.9592290159835, "y": 336.27909394431566, "information": {"type": "Person", "name": "Kamya Sarkar", "age": "24", "gender": "Female", "occupation": "Employee", "city": "Visakhapatnam", "id": "P017"}}, {"id": "P018", "label": "P018", "type": "Person", "color": "#ff6b6b", "x": 811.3368172987595, "y": 99.9718061978626, "information": {"type": "Person", "name": "Fariq Bhagat", "age": "58", "gender": "Female", "occupation": "Driver", "city": "Hyderabad", "id": "P018"}}, {"id": "P019", "label": "P019", "type": "Person", "color": "#ff6b6b", "x": 707.4612971699487, "y": 399.49495811293565, "information": {"type": "Person", "name": "Gautam Srinivasan", "age": "40", "gender": "Male", "occupation": "Mechanic", "city": "Hyderabad", "id": "P019"}}, {"id": "P020", "label": "P020", "type": "Person", "color": "#ff6b6b", "x": 655.8018328225701, "y": 749.961167081583, "information": {"type": "Person", "name": "Keya Sani", "age": "59", "gender": "Male", "occupation": "Trader", "city": "Rajahmundry", "id": "P020"}}, {"id": "P021", "label": "P021", "type": "Person", "color": "#ff6b6b", "x": 820.655103244292, "y": 619.3605831027976, "information": {"type": "Person", "name": "Rachit Chana", "age": "28", "gender": "Male", "occupation": "Driver", "city": "Visakhapatnam", "id": "P021"}}, {"id": "P022", "label": "P022", "type": "Person", "color": "#ff6b6b", "x": 1024.7472025333618, "y": 724.5664975228991, "information": {"type": "Person", "name": "Rajata Reddy", "age": "42", "gender": "Female", "occupation": "Mechanic", "city": "Rajahmundry", "id": "P022"}}, {"id": "P023", "label": "P023", "type": "Person", "color": "#ff6b6b", "x": 510.8842523179982, "y": 724.6912124844638, "information": {"type": "Person", "name": "Bhavini Ghosh", "age": "53", "gender": "Male", "occupation": "Mechanic", "city": "Hyderabad", "id": "P023"}}, {"id": "P024", "label": "P024", "type": "Person", "color": "#ff6b6b", "x": 155.9890272596467, "y": 604.6661048406959, "information": {"type": "Person", "name": "Vedhika Mane", "age": "21", "gender": "Male", "occupation": "Unknown", "city": "Vijayawada", "id": "P024"}}, {"id": "P025", "label": "P025", "type": "Person", "color": "#ff6b6b", "x": 372.38275024255904, "y": 722.7233327268964, "information": {"type": "Person", "name": "Sai Solanki", "age": "38", "gender": "Female", "occupation": "Employee", "city": "Vijayawada", "id": "P025"}}, {"id": "P026", "label": "P026", "type": "Person", "color": "#ff6b6b", "x": 99.36737410067872, "y": 357.8524372445678, "information": {"type": "Person", "name": "Faqid Tailor", "age": "31", "gender": "Female", "occupation": "Driver", "city": "Rajahmundry", "id": "P026"}}, {"id": "P027", "label": "P027", "type": "Person", "color": "#ff6b6b", "x": 219.7025430972285, "y": 658.3870567081606, "information": {"type": "Person", "name": "Ekiya Sandhu", "age": "49", "gender": "Female", "occupation": "Mechanic", "city": "Visakhapatnam", "id": "P027"}}, {"id": "P028", "label": "P028", "type": "Person", "color": "#ff6b6b", "x": 709.7109801628947, "y": 700.1109348320524, "information": {"type": "Person", "name": "Urmi Sachdeva", "age": "27", "gender": "Female", "occupation": "Driver", "city": "Guntur", "id": "P028"}}, {"id": "P029", "label": "P029", "type": "Person", "color": "#ff6b6b", "x": 850.1478425605793, "y": 90.79520785956494, "information": {"type": "Person", "name": "Tanmayi Mandal", "age": "53", "gender": "Female", "occupation": "Mechanic", "city": "Bhimavaram", "id": "P029"}}, {"id": "P030", "label": "P030", "type": "Person", "color": "#ff6b6b", "x": 320.569230915509, "y": 675.0581778562324, "information": {"type": "Person", "name": "Mitali Deo", "age": "45", "gender": "Female", "occupation": "Employee", "city": "Guntur", "id": "P030"}}, {"id": "P031", "label": "P031", "type": "Person", "color": "#ff6b6b", "x": 1264.4066618376116, "y": 580.8857609755021, "information": {"type": "Person", "name": "Darpan Sethi", "age": "26", "gender": "Female", "occupation": "Business", "city": "Vijayawada", "id": "P031"}}, {"id": "P032", "label": "P032", "type": "Person", "color": "#ff6b6b", "x": 1287.6741843562127, "y": 321.8532791570665, "information": {"type": "Person", "name": "Simon Wadhwa", "age": "25", "gender": "Male", "occupation": "Mechanic", "city": "Guntur", "id": "P032"}}, {"id": "P033", "label": "P033", "type": "Person", "color": "#ff6b6b", "x": 1311.8012110958653, "y": 443.90174821738236, "information": {"type": "Person", "name": "Manan Saha", "age": "45", "gender": "Male", "occupation": "Student", "city": "Visakhapatnam", "id": "P033"}}, {"id": "P034", "label": "P034", "type": "Person", "color": "#ff6b6b", "x": 200.52653197370273, "y": 205.86926877735786, "information": {"type": "Person", "name": "Sanaya Prakash", "age": "56", "gender": "Female", "occupation": "Trader", "city": "Hyderabad", "id": "P034"}}, {"id": "P035", "label": "P035", "type": "Person", "color": "#ff6b6b", "x": 97.87706492170582, "y": 505.1483463074724, "information": {"type": "Person", "name": "Qarin Prabhakar", "age": "53", "gender": "Male", "occupation": "Mechanic", "city": "Rajahmundry", "id": "P035"}}, {"id": "P036", "label": "P036", "type": "Person", "color": "#ff6b6b", "x": 143.40168799760022, "y": 419.6065357449276, "information": {"type": "Person", "name": "Yuvraj Bhalla", "age": "25", "gender": "Female", "occupation": "Unknown", "city": "Rajahmundry", "id": "P036"}}, {"id": "P037", "label": "P037", "type": "Person", "color": "#ff6b6b", "x": 1154.5449495876783, "y": 179.17326083934898, "information": {"type": "Person", "name": "Lakshit Dass", "age": "39", "gender": "Male", "occupation": "Employee", "city": "Visakhapatnam", "id": "P037"}}, {"id": "P038", "label": "P038", "type": "Person", "color": "#ff6b6b", "x": 102.14494714758283, "y": 379.1435343630969, "information": {"type": "Person", "name": "Devika Anand", "age": "28", "gender": "Female", "occupation": "Business", "city": "Rajahmundry", "id": "P038"}}, {"id": "P039", "label": "P039", "type": "Person", "color": "#ff6b6b", "x": 101.58430915533386, "y": 474.6462014283942, "information": {"type": "Person", "name": "Parth Kapadia", "age": "34", "gender": "Male", "occupation": "Trader", "city": "Vijayawada", "id": "P039"}}, {"id": "P040", "label": "P040", "type": "Person", "color": "#ff6b6b", "x": 1307.2031290397158, "y": 477.3383768914374, "information": {"type": "Person", "name": "Prisha Bora", "age": "58", "gender": "Female", "occupation": "Unknown", "city": "Rajahmundry", "id": "P040"}}, {"id": "P041", "label": "P041", "type": "Person", "color": "#ff6b6b", "x": 1074.5485522582453, "y": 712.6550524765088, "information": {"type": "Person", "name": "Madhav Kalita", "age": "50", "gender": "Male", "occupation": "Driver", "city": "Hyderabad", "id": "P041"}}, {"id": "P042", "label": "P042", "type": "Person", "color": "#ff6b6b", "x": 142.52713478922732, "y": 284.58841212664856, "information": {"type": "Person", "name": "Nirja Madan", "age": "28", "gender": "Male", "occupation": "Trader", "city": "Hyderabad", "id": "P042"}}, {"id": "P043", "label": "P043", "type": "Person", "color": "#ff6b6b", "x": 671.715724532914, "y": 83.3206864288754, "information": {"type": "Person", "name": "Tripti Trivedi", "age": "49", "gender": "Male", "occupation": "Business", "city": "Hyderabad", "id": "P043"}}, {"id": "P044", "label": "P044", "type": "Person", "color": "#ff6b6b", "x": 738.9829406751486, "y": 445.3696683432767, "information": {"type": "Person", "name": "Alka Singhal", "age": "37", "gender": "Male", "occupation": "Business", "city": "Guntur", "id": "P044"}}, {"id": "P045", "label": "P045", "type": "Person", "color": "#ff6b6b", "x": 841.2309075629599, "y": 457.88926088617853, "information": {"type": "Person", "name": "Qarin Rau", "age": "54", "gender": "Male", "occupation": "Business", "city": "Rajahmundry", "id": "P045"}}, {"id": "P046", "label": "P046", "type": "Person", "color": "#ff6b6b", "x": 95.07233971922712, "y": 397.50276953435167, "information": {"type": "Person", "name": "Adya Lala", "age": "49", "gender": "Male", "occupation": "Unknown", "city": "Bhimavaram", "id": "P046"}}, {"id": "P047", "label": "P047", "type": "Person", "color": "#ff6b6b", "x": 1193.2613259997095, "y": 618.7626629916261, "information": {"type": "Person", "name": "Kritika Mittal", "age": "26", "gender": "Male", "occupation": "Mechanic", "city": "Visakhapatnam", "id": "P047"}}, {"id": "P048", "label": "P048", "type": "Person", "color": "#ff6b6b", "x": 254.38345905187157, "y": 168.3099245267041, "information": {"type": "Person", "name": "Oeshi Bath", "age": "53", "gender": "Male", "occupation": "Employee", "city": "Bhimavaram", "id": "P048"}}, {"id": "P049", "label": "P049", "type": "Person", "color": "#ff6b6b", "x": 1256.2951011767123, "y": 564.8443468069299, "information": {"type": "Person", "name": "Ansh D’Alia", "age": "56", "gender": "Female", "occupation": "Driver", "city": "Bhimavaram", "id": "P049"}}, {"id": "P050", "label": "P050", "type": "Person", "color": "#ff6b6b", "x": 1311.623235250829, "y": 410.54631259084204, "information": {"type": "Person", "name": "Nidra Goyal", "age": "30", "gender": "Female", "occupation": "Student", "city": "Rajahmundry", "id": "P050"}}, {"id": "P051", "label": "P051", "type": "Person", "color": "#ff6b6b", "x": 1287.9783455882177, "y": 298.59948868813933, "information": {"type": "Person", "name": "Ryan Thakur", "age": "59", "gender": "Female", "occupation": "Student", "city": "Bhimavaram", "id": "P051"}}, {"id": "P052", "label": "P052", "type": "Person", "color": "#ff6b6b", "x": 599.4764755142209, "y": 381.49026958856865, "information": {"type": "Person", "name": "Mason Goel", "age": "46", "gender": "Male", "occupation": "Driver", "city": "Guntur", "id": "P052"}}, {"id": "P053", "label": "P053", "type": "Person", "color": "#ff6b6b", "x": 685.3993052044767, "y": 766.5209667925777, "information": {"type": "Person", "name": "Anjali Brahmbhatt", "age": "22", "gender": "Female", "occupation": "Business", "city": "Bhimavaram", "id": "P053"}}, {"id": "P054", "label": "P054", "type": "Person", "color": "#ff6b6b", "x": 1301.0122954503574, "y": 459.8684482276406, "information": {"type": "Person", "name": "Nimrat Rout", "age": "53", "gender": "Male", "occupation": "Trader", "city": "Guntur", "id": "P054"}}, {"id": "P055", "label": "P055", "type": "Person", "color": "#ff6b6b", "x": 898.0305644047749, "y": 127.25159034602902, "information": {"type": "Person", "name": "Kai Khatri", "age": "18", "gender": "Male", "occupation": "Mechanic", "city": "Rajahmundry", "id": "P055"}}, {"id": "P056", "label": "P056", "type": "Person", "color": "#ff6b6b", "x": 1173.218013879975, "y": 648.9836092980141, "information": {"type": "Person", "name": "Yasti Mandal", "age": "21", "gender": "Male", "occupation": "Business", "city": "Vijayawada", "id": "P056"}}, {"id": "P057", "label": "P057", "type": "Person", "color": "#ff6b6b", "x": 789.5869907607222, "y": 368.1939534153811, "information": {"type": "Person", "name": "Anjali Merchant", "age": "39", "gender": "Male", "occupation": "Trader", "city": "Guntur", "id": "P057"}}, {"id": "P058", "label": "P058", "type": "Person", "color": "#ff6b6b", "x": 469.4127640036189, "y": 100.1744741672265, "information": {"type": "Person", "name": "Manthan Sahni", "age": "35", "gender": "Female", "occupation": "Driver", "city": "Bhimavaram", "id": "P058"}}, {"id": "P059", "label": "P059", "type": "Person", "color": "#ff6b6b", "x": 1229.9468024296118, "y": 611.7807267797443, "information": {"type": "Person", "name": "Dev Pandya", "age": "26", "gender": "Female", "occupation": "Driver", "city": "Visakhapatnam", "id": "P059"}}, {"id": "P060", "label": "P060", "type": "Person", "color": "#ff6b6b", "x": 1286.6563025223788, "y": 550.0086292253998, "information": {"type": "Person", "name": "Frederick Walla", "age": "44", "gender": "Male", "occupation": "Business", "city": "Vijayawada", "id": "P060"}}, {"id": "P061", "label": "P061", "type": "Person", "color": "#ff6b6b", "x": 637.1868464610243, "y": 83.93707410562264, "information": {"type": "Person", "name": "Yashoda Aurora", "age": "60", "gender": "Female", "occupation": "Employee", "city": "Visakhapatnam", "id": "P061"}}, {"id": "P062", "label": "P062", "type": "Person", "color": "#ff6b6b", "x": 715.6429900570427, "y": 377.08684437410085, "information": {"type": "Person", "name": "Ekansh Merchant", "age": "44", "gender": "Female", "occupation": "Unknown", "city": "Rajahmundry", "id": "P062"}}, {"id": "P063", "label": "P063", "type": "Person", "color": "#ff6b6b", "x": 1297.289695873262, "y": 503.1559056510244, "information": {"type": "Person", "name": "Mason Sekhon", "age": "21", "gender": "Male", "occupation": "Business", "city": "Visakhapatnam", "id": "P063"}}, {"id": "P064", "label": "P064", "type": "Person", "color": "#ff6b6b", "x": 1099.8203181049194, "y": 162.05208770674867, "information": {"type": "Person", "name": "Maya Seshadri", "age": "39", "gender": "Male", "occupation": "Driver", "city": "Guntur", "id": "P064"}}, {"id": "P065", "label": "P065", "type": "Person", "color": "#ff6b6b", "x": 170.295083069386, "y": 241.9274451865622, "information": {"type": "Person", "name": "Yashoda Mane", "age": "30", "gender": "Female", "occupation": "Driver", "city": "Visakhapatnam", "id": "P065"}}, {"id": "P066", "label": "P066", "type": "Person", "color": "#ff6b6b", "x": 1212.9986957133822, "y": 237.50053413684373, "information": {"type": "Person", "name": "Gaurang Pillai", "age": "29", "gender": "Female", "occupation": "Student", "city": "Guntur", "id": "P066"}}, {"id": "P067", "label": "P067", "type": "Person", "color": "#ff6b6b", "x": 921.3982452544941, "y": 97.8218104814297, "information": {"type": "Person", "name": "Sachi Bhargava", "age": "22", "gender": "Female", "occupation": "Unknown", "city": "Bhimavaram", "id": "P067"}}, {"id": "P068", "label": "P068", "type": "Person", "color": "#ff6b6b", "x": 208.7183021781109, "y": 603.77786715517, "information": {"type": "Person", "name": "Indira Som", "age": "24", "gender": "Male", "occupation": "Mechanic", "city": "Bhimavaram", "id": "P068"}}, {"id": "P069", "label": "P069", "type": "Person", "color": "#ff6b6b", "x": 197.52773325237897, "y": 631.0292437982387, "information": {"type": "Person", "name": "Hardik Nagarajan", "age": "18", "gender": "Male", "occupation": "Unknown", "city": "Guntur", "id": "P069"}}, {"id": "P070", "label": "P070", "type": "Person", "color": "#ff6b6b", "x": 1252.1965446746685, "y": 281.737887188378, "information": {"type": "Person", "name": "Ubika Bhasin", "age": "28", "gender": "Female", "occupation": "Student", "city": "Visakhapatnam", "id": "P070"}}, {"id": "P071", "label": "P071", "type": "Person", "color": "#ff6b6b", "x": 987.935575604365, "y": 126.7631808262808, "information": {"type": "Person", "name": "Girik Kar", "age": "31", "gender": "Female", "occupation": "Business", "city": "Guntur", "id": "P071"}}, {"id": "P072", "label": "P072", "type": "Person", "color": "#ff6b6b", "x": 146.8345234791267, "y": 303.9383210359302, "information": {"type": "Person", "name": "Bachittar Saran", "age": "42", "gender": "Male", "occupation": "Student", "city": "Hyderabad", "id": "P072"}}, {"id": "P073", "label": "P073", "type": "Person", "color": "#ff6b6b", "x": 943.2243899152572, "y": 727.2341835943369, "information": {"type": "Person", "name": "Michael Vasa", "age": "47", "gender": "Female", "occupation": "Student", "city": "Rajahmundry", "id": "P073"}}, {"id": "P074", "label": "P074", "type": "Person", "color": "#ff6b6b", "x": 368.64844869904204, "y": 134.74608205551363, "information": {"type": "Person", "name": "Yachana Kalla", "age": "53", "gender": "Female", "occupation": "Driver", "city": "Guntur", "id": "P074"}}, {"id": "P075", "label": "P075", "type": "Person", "color": "#ff6b6b", "x": 983.3063423763035, "y": 731.8336556263578, "information": {"type": "Person", "name": "Ekta Sandal", "age": "36", "gender": "Male", "occupation": "Business", "city": "Bhimavaram", "id": "P075"}}, {"id": "P076", "label": "P076", "type": "Person", "color": "#ff6b6b", "x": 146.5686319301597, "y": 571.2842510198151, "information": {"type": "Person", "name": "Gopal Chakraborty", "age": "52", "gender": "Male", "occupation": "Mechanic", "city": "Hyderabad", "id": "P076"}}, {"id": "P077", "label": "P077", "type": "Person", "color": "#ff6b6b", "x": 1308.3763225061205, "y": 368.4048905114987, "information": {"type": "Person", "name": "Lekha Kaur", "age": "21", "gender": "Male", "occupation": "Trader", "city": "Visakhapatnam", "id": "P077"}}, {"id": "P078", "label": "P078", "type": "Person", "color": "#ff6b6b", "x": 584.9997982749339, "y": 89.32867571350762, "information": {"type": "Person", "name": "Aarini Jain", "age": "50", "gender": "Male", "occupation": "Business", "city": "Bhimavaram", "id": "P078"}}, {"id": "P079", "label": "P079", "type": "Person", "color": "#ff6b6b", "x": 414.540543475499, "y": 741.1275158700663, "information": {"type": "Person", "name": "Gaurav Cheema", "age": "23", "gender": "Male", "occupation": "Business", "city": "Bhimavaram", "id": "P079"}}, {"id": "P080", "label": "P080", "type": "Person", "color": "#ff6b6b", "x": 257.34193775157723, "y": 656.1002416021432, "information": {"type": "Person", "name": "Yochana Shan", "age": "22", "gender": "Male", "occupation": "Student", "city": "Vijayawada", "id": "P080"}}, {"id": "P081", "label": "P081", "type": "Person", "color": "#ff6b6b", "x": 887.154748716104, "y": 745.6896847438039, "information": {"type": "Person", "name": "Vanya Radhakrishnan", "age": "54", "gender": "Male", "occupation": "Trader", "city": "Bhimavaram", "id": "P081"}}, {"id": "P082", "label": "P082", "type": "Person", "color": "#ff6b6b", "x": 1188.8203164330625, "y": 209.64999065143618, "information": {"type": "Person", "name": "Leela Shetty", "age": "20", "gender": "Male", "occupation": "Student", "city": "Rajahmundry", "id": "P082"}}, {"id": "P083", "label": "P083", "type": "Person", "color": "#ff6b6b", "x": 260.0243383214397, "y": 627.7609153603657, "information": {"type": "Person", "name": "Amruta Koshy", "age": "55", "gender": "Female", "occupation": "Employee", "city": "Guntur", "id": "P083"}}, {"id": "P084", "label": "P084", "type": "Person", "color": "#ff6b6b", "x": 1045.9178789572677, "y": 141.75573148360002, "information": {"type": "Person", "name": "Vanya Krishnamurthy", "age": "60", "gender": "Female", "occupation": "Driver", "city": "Hyderabad", "id": "P084"}}, {"id": "P085", "label": "P085", "type": "Person", "color": "#ff6b6b", "x": 532.9095008904944, "y": 103.31559347527917, "information": {"type": "Person", "name": "Ganga Ray", "age": "43", "gender": "Male", "occupation": "Mechanic", "city": "Rajahmundry", "id": "P085"}}, {"id": "P086", "label": "P086", "type": "Person", "color": "#ff6b6b", "x": 86.34692147926138, "y": 459.04399825338913, "information": {"type": "Person", "name": "Reyansh Sachdev", "age": "37", "gender": "Female", "occupation": "Employee", "city": "Vijayawada", "id": "P086"}}, {"id": "P087", "label": "P087", "type": "Person", "color": "#ff6b6b", "x": 125.14942213597914, "y": 493.41120344869836, "information": {"type": "Person", "name": "Liam Dash", "age": "18", "gender": "Female", "occupation": "Trader", "city": "Bhimavaram", "id": "P087"}}, {"id": "P088", "label": "P088", "type": "Person", "color": "#ff6b6b", "x": 306.79469858603795, "y": 176.9269611835884, "information": {"type": "Person", "name": "Naksh Bora", "age": "24", "gender": "Male", "occupation": "Trader", "city": "Guntur", "id": "P088"}}, {"id": "P089", "label": "P089", "type": "Person", "color": "#ff6b6b", "x": 765.2572535107375, "y": 770.0, "information": {"type": "Person", "name": "Qadim Vala", "age": "50", "gender": "Female", "occupation": "Driver", "city": "Hyderabad", "id": "P089"}}, {"id": "P090", "label": "P090", "type": "Person", "color": "#ff6b6b", "x": 551.4391503550587, "y": 89.07767207388197, "information": {"type": "Person", "name": "Abhiram Keer", "age": "22", "gender": "Male", "occupation": "Employee", "city": "Hyderabad", "id": "P090"}}, {"id": "P091", "label": "P091", "type": "Person", "color": "#ff6b6b", "x": 142.41485268161978, "y": 348.08015122067866, "information": {"type": "Person", "name": "Libni Chada", "age": "28", "gender": "Female", "occupation": "Unknown", "city": "Bhimavaram", "id": "P091"}}, {"id": "P092", "label": "P092", "type": "Person", "color": "#ff6b6b", "x": 613.4783512064138, "y": 94.81805964291544, "information": {"type": "Person", "name": "Kritika Kapur", "age": "37", "gender": "Male", "occupation": "Mechanic", "city": "Bhimavaram", "id": "P092"}}, {"id": "P093", "label": "P093", "type": "Person", "color": "#ff6b6b", "x": 857.7769717388184, "y": 757.0384710286462, "information": {"type": "Person", "name": "Gavin Kadakia", "age": "37", "gender": "Male", "occupation": "Driver", "city": "Hyderabad", "id": "P093"}}, {"id": "P094", "label": "P094", "type": "Person", "color": "#ff6b6b", "x": 1206.1738968940515, "y": 637.0989038923277, "information": {"type": "Person", "name": "Ria Prasad", "age": "25", "gender": "Male", "occupation": "Mechanic", "city": "Bhimavaram", "id": "P094"}}, {"id": "P095", "label": "P095", "type": "Person", "color": "#ff6b6b", "x": 1240.560174099909, "y": 246.77541386697487, "information": {"type": "Person", "name": "Devika Dalal", "age": "27", "gender": "Female", "occupation": "Employee", "city": "Bhimavaram", "id": "P095"}}, {"id": "P096", "label": "P096", "type": "Person", "color": "#ff6b6b", "x": 123.90450690558654, "y": 540.9276514518708, "information": {"type": "Person", "name": "Raghav Bajaj", "age": "31", "gender": "Female", "occupation": "Driver", "city": "Rajahmundry", "id": "P096"}}, {"id": "P097", "label": "P097", "type": "Person", "color": "#ff6b6b", "x": 245.8342376622579, "y": 212.50836969245194, "information": {"type": "Person", "name": "Dev Nagar", "age": "58", "gender": "Female", "occupation": "Trader", "city": "Visakhapatnam", "id": "P097"}}, {"id": "P098", "label": "P098", "type": "Person", "color": "#ff6b6b", "x": 896.2998310250989, "y": 664.5982803791259, "information": {"type": "Person", "name": "Aarush Kakar", "age": "34", "gender": "Male", "occupation": "Business", "city": "Rajahmundry", "id": "P098"}}, {"id": "P099", "label": "P099", "type": "Person", "color": "#ff6b6b", "x": 703.6552414909851, "y": 88.268541550312, "information": {"type": "Person", "name": "Ikshita Dass", "age": "45", "gender": "Female", "occupation": "Business", "city": "Vijayawada", "id": "P099"}}, {"id": "P100", "label": "P100", "type": "Person", "color": "#ff6b6b", "x": 101.69975608967538, "y": 335.27628804945834, "information": {"type": "Person", "name": "Aarnav Nigam", "age": "39", "gender": "Male", "occupation": "Mechanic", "city": "Hyderabad", "id": "P100"}}, {"id": "P101", "label": "P101", "type": "Person", "color": "#ff6b6b", "x": 593.0918484795108, "y": 431.2242756312979, "information": {"type": "Person", "name": "Maya Cheema", "age": "28", "gender": "Female", "occupation": "Trader", "city": "Rajahmundry", "id": "P101"}}, {"id": "P102", "label": "P102", "type": "Person", "color": "#ff6b6b", "x": 97.24063412422143, "y": 440.73859094134315, "information": {"type": "Person", "name": "Ridhi Bhatia", "age": "45", "gender": "Male", "occupation": "Business", "city": "Vijayawada", "id": "P102"}}, {"id": "P103", "label": "P103", "type": "Person", "color": "#ff6b6b", "x": 1087.5895699410976, "y": 692.0303738406797, "information": {"type": "Person", "name": "Pushti More", "age": "27", "gender": "Male", "occupation": "Unknown", "city": "Hyderabad", "id": "P103"}}, {"id": "P104", "label": "P104", "type": "Person", "color": "#ff6b6b", "x": 731.8509506562068, "y": 416.52895921563703, "information": {"type": "Person", "name": "Ojas Shankar", "age": "55", "gender": "Male", "occupation": "Student", "city": "Guntur", "id": "P104"}}, {"id": "P105", "label": "P105", "type": "Person", "color": "#ff6b6b", "x": 1124.688463590109, "y": 684.8953552951252, "information": {"type": "Person", "name": "Aryan Sahni", "age": "20", "gender": "Female", "occupation": "Employee", "city": "Vijayawada", "id": "P105"}}, {"id": "P106", "label": "P106", "type": "Person", "color": "#ff6b6b", "x": 342.5295138261833, "y": 151.24982383119396, "information": {"type": "Person", "name": "Ishanvi Kunda", "age": "40", "gender": "Male", "occupation": "Mechanic", "city": "Guntur", "id": "P106"}}, {"id": "P107", "label": "P107", "type": "Person", "color": "#ff6b6b", "x": 1292.327945297379, "y": 351.93335320965406, "information": {"type": "Person", "name": "Rayaan Choudhry", "age": "60", "gender": "Male", "occupation": "Employee", "city": "Bhimavaram", "id": "P107"}}, {"id": "P108", "label": "P108", "type": "Person", "color": "#ff6b6b", "x": 115.4884308104025, "y": 308.15455644475276, "information": {"type": "Person", "name": "Maanas Sem", "age": "44", "gender": "Male", "occupation": "Driver", "city": "Guntur", "id": "P108"}}, {"id": "P109", "label": "P109", "type": "Person", "color": "#ff6b6b", "x": 455.8084850644075, "y": 729.3362904971541, "information": {"type": "Person", "name": "Abeer Andra", "age": "29", "gender": "Female", "occupation": "Business", "city": "Guntur", "id": "P109"}}, {"id": "P110", "label": "P110", "type": "Person", "color": "#ff6b6b", "x": 594.44843561251, "y": 499.92828000992085, "information": {"type": "Person", "name": "Vincent Ratti", "age": "39", "gender": "Female", "occupation": "Unknown", "city": "Rajahmundry", "id": "P110"}}, {"id": "P111", "label": "P111", "type": "Person", "color": "#ff6b6b", "x": 432.4687860794832, "y": 135.84412225613906, "information": {"type": "Person", "name": "Ojas Varty", "age": "33", "gender": "Female", "occupation": "Driver", "city": "Rajahmundry", "id": "P111"}}, {"id": "P112", "label": "P112", "type": "Person", "color": "#ff6b6b", "x": 502.46677073452537, "y": 100.17730116143711, "information": {"type": "Person", "name": "Quincy Chahal", "age": "24", "gender": "Female", "occupation": "Unknown", "city": "Vijayawada", "id": "P112"}}, {"id": "P113", "label": "P113", "type": "Person", "color": "#ff6b6b", "x": 1159.6120562730255, "y": 199.69976505575607, "information": {"type": "Person", "name": "Bishakha Vora", "age": "48", "gender": "Male", "occupation": "Driver", "city": "Visakhapatnam", "id": "P113"}}, {"id": "P114", "label": "P114", "type": "Person", "color": "#ff6b6b", "x": 444.65926703607795, "y": 112.37507345668602, "information": {"type": "Person", "name": "Bhanumati Ramakrishnan", "age": "40", "gender": "Female", "occupation": "Unknown", "city": "Guntur", "id": "P114"}}, {"id": "P115", "label": "P115", "type": "Person", "color": "#ff6b6b", "x": 598.0088750916645, "y": 746.41340353228, "information": {"type": "Person", "name": "Brijesh Mukhopadhyay", "age": "32", "gender": "Male", "occupation": "Mechanic", "city": "Guntur", "id": "P115"}}, {"id": "P116", "label": "P116", "type": "Person", "color": "#ff6b6b", "x": 632.481577689182, "y": 456.064344143753, "information": {"type": "Person", "name": "Damini Gopal", "age": "43", "gender": "Female", "occupation": "Employee", "city": "Vijayawada", "id": "P116"}}, {"id": "P117", "label": "P117", "type": "Person", "color": "#ff6b6b", "x": 1251.6276446615727, "y": 264.8023828302607, "information": {"type": "Person", "name": "Faqid Rastogi", "age": "35", "gender": "Female", "occupation": "Mechanic", "city": "Bhimavaram", "id": "P117"}}, {"id": "P118", "label": "P118", "type": "Person", "color": "#ff6b6b", "x": 1095.5040391321754, "y": 650.2488180103463, "information": {"type": "Person", "name": "Waida Anand", "age": "43", "gender": "Female", "occupation": "Business", "city": "Vijayawada", "id": "P118"}}, {"id": "P119", "label": "P119", "type": "Person", "color": "#ff6b6b", "x": 682.6816636207202, "y": 446.1557813436989, "information": {"type": "Person", "name": "Pavani Vyas", "age": "34", "gender": "Male", "occupation": "Trader", "city": "Hyderabad", "id": "P119"}}, {"id": "P120", "label": "P120", "type": "Person", "color": "#ff6b6b", "x": 1176.7488638578466, "y": 229.60878882486833, "information": {"type": "Person", "name": "Ekiya Venkatesh", "age": "20", "gender": "Male", "occupation": "Trader", "city": "Visakhapatnam", "id": "P120"}}, {"id": "P121", "label": "P121", "type": "Person", "color": "#ff6b6b", "x": 124.85289834037002, "y": 521.3388742875477, "information": {"type": "Person", "name": "Manbir Parekh", "age": "40", "gender": "Female", "occupation": "Student", "city": "Bhimavaram", "id": "P121"}}, {"id": "P122", "label": "P122", "type": "Person", "color": "#ff6b6b", "x": 1249.6044576776244, "y": 305.4796129775929, "information": {"type": "Person", "name": "Noah Kamdar", "age": "50", "gender": "Male", "occupation": "Student", "city": "Bhimavaram", "id": "P122"}}, {"id": "P123", "label": "P123", "type": "Person", "color": "#ff6b6b", "x": 1320.0, "y": 394.2341931300418, "information": {"type": "Person", "name": "Jeet Loke", "age": "30", "gender": "Female", "occupation": "Business", "city": "Rajahmundry", "id": "P123"}}, {"id": "P124", "label": "P124", "type": "Person", "color": "#ff6b6b", "x": 752.5276224046021, "y": 98.02896117454048, "information": {"type": "Person", "name": "Oviya Aurora", "age": "45", "gender": "Male", "occupation": "Trader", "city": "Bhimavaram", "id": "P124"}}, {"id": "P125", "label": "P125", "type": "Person", "color": "#ff6b6b", "x": 1028.2995399583492, "y": 705.3016815702099, "information": {"type": "Person", "name": "Ria Atwal", "age": "60", "gender": "Male", "occupation": "Employee", "city": "Visakhapatnam", "id": "P125"}}, {"id": "P126", "label": "P126", "type": "Person", "color": "#ff6b6b", "x": 698.8645067133009, "y": 358.1190601504477, "information": {"type": "Person", "name": "Mugdha Prakash", "age": "22", "gender": "Female", "occupation": "Trader", "city": "Hyderabad", "id": "P126"}}, {"id": "P127", "label": "P127", "type": "Person", "color": "#ff6b6b", "x": 740.1044497916771, "y": 80.0, "information": {"type": "Person", "name": "Diya Garde", "age": "60", "gender": "Male", "occupation": "Mechanic", "city": "Hyderabad", "id": "P127"}}, {"id": "P128", "label": "P128", "type": "Person", "color": "#ff6b6b", "x": 261.23997606934756, "y": 189.9006156239883, "information": {"type": "Person", "name": "Sathvik Konda", "age": "50", "gender": "Female", "occupation": "Mechanic", "city": "Visakhapatnam", "id": "P128"}}, {"id": "P129", "label": "P129", "type": "Person", "color": "#ff6b6b", "x": 958.5324823905471, "y": 112.20222167920417, "information": {"type": "Person", "name": "Rachita Thakur", "age": "38", "gender": "Female", "occupation": "Mechanic", "city": "Hyderabad", "id": "P129"}}, {"id": "P130", "label": "P130", "type": "Person", "color": "#ff6b6b", "x": 827.5727208565468, "y": 750.8757988169755, "information": {"type": "Person", "name": "Charles Natt", "age": "53", "gender": "Male", "occupation": "Driver", "city": "Visakhapatnam", "id": "P130"}}, {"id": "P131", "label": "P131", "type": "Person", "color": "#ff6b6b", "x": 356.8541856467333, "y": 699.8181438906146, "information": {"type": "Person", "name": "Nimrat Kuruvilla", "age": "60", "gender": "Female", "occupation": "Mechanic", "city": "Rajahmundry", "id": "P131"}}, {"id": "P132", "label": "P132", "type": "Person", "color": "#ff6b6b", "x": 724.0754386531481, "y": 763.7072382786002, "information": {"type": "Person", "name": "Jhalak Master", "age": "29", "gender": "Female", "occupation": "Student", "city": "Bhimavaram", "id": "P132"}}, {"id": "P133", "label": "P133", "type": "Person", "color": "#ff6b6b", "x": 1301.4936765606833, "y": 427.0335015112052, "information": {"type": "Person", "name": "Forum Goda", "age": "18", "gender": "Female", "occupation": "Employee", "city": "Guntur", "id": "P133"}}, {"id": "P134", "label": "P134", "type": "Person", "color": "#ff6b6b", "x": 1237.8270952563946, "y": 594.584556594173, "information": {"type": "Person", "name": "Jairaj Chada", "age": "45", "gender": "Female", "occupation": "Student", "city": "Visakhapatnam", "id": "P134"}}, {"id": "P135", "label": "P135", "type": "Person", "color": "#ff6b6b", "x": 532.550965026207, "y": 758.1784395797913, "information": {"type": "Person", "name": "Vrishti Puri", "age": "46", "gender": "Male", "occupation": "Trader", "city": "Visakhapatnam", "id": "P135"}}, {"id": "P136", "label": "P136", "type": "Person", "color": "#ff6b6b", "x": 537.6397370638115, "y": 342.83615103426035, "information": {"type": "Person", "name": "Arunima Chahal", "age": "28", "gender": "Male", "occupation": "Employee", "city": "Bhimavaram", "id": "P136"}}, {"id": "P137", "label": "P137", "type": "Person", "color": "#ff6b6b", "x": 926.9053699777908, "y": 747.0433044488641, "information": {"type": "Person", "name": "Bhavani Shukla", "age": "60", "gender": "Female", "occupation": "Business", "city": "Guntur", "id": "P137"}}, {"id": "P138", "label": "P138", "type": "Person", "color": "#ff6b6b", "x": 876.9648339505345, "y": 102.95369883662823, "information": {"type": "Person", "name": "Geetika Kade", "age": "37", "gender": "Male", "occupation": "Unknown", "city": "Guntur", "id": "P138"}}, {"id": "P139", "label": "P139", "type": "Person", "color": "#ff6b6b", "x": 1296.498224802644, "y": 521.7581094599506, "information": {"type": "Person", "name": "Qasim Ratti", "age": "27", "gender": "Male", "occupation": "Business", "city": "Guntur", "id": "P139"}}, {"id": "P140", "label": "P140", "type": "Person", "color": "#ff6b6b", "x": 1116.4823137483322, "y": 179.55192416421767, "information": {"type": "Person", "name": "Geetika Soman", "age": "48", "gender": "Male", "occupation": "Student", "city": "Visakhapatnam", "id": "P140"}}, {"id": "P141", "label": "P141", "type": "Person", "color": "#ff6b6b", "x": 624.8366747637165, "y": 766.6643904296861, "information": {"type": "Person", "name": "Warda Patla", "age": "58", "gender": "Male", "occupation": "Mechanic", "city": "Rajahmundry", "id": "P141"}}, {"id": "P142", "label": "P142", "type": "Person", "color": "#ff6b6b", "x": 179.46805155007013, "y": 584.3976591919443, "information": {"type": "Person", "name": "Arya Krish", "age": "42", "gender": "Female", "occupation": "Student", "city": "Guntur", "id": "P142"}}, {"id": "P143", "label": "P143", "type": "Person", "color": "#ff6b6b", "x": 412.78670037640626, "y": 708.0751256811609, "information": {"type": "Person", "name": "Niharika Setty", "age": "27", "gender": "Male", "occupation": "Unknown", "city": "Vijayawada", "id": "P143"}}, {"id": "P144", "label": "P144", "type": "Person", "color": "#ff6b6b", "x": 1265.6886792096886, "y": 488.818768771292, "information": {"type": "Person", "name": "Andrew Bhatti", "age": "45", "gender": "Male", "occupation": "Driver", "city": "Rajahmundry", "id": "P144"}}, {"id": "P145", "label": "P145", "type": "Person", "color": "#ff6b6b", "x": 792.9607589225362, "y": 80.15360139913228, "information": {"type": "Person", "name": "Kavya Das", "age": "51", "gender": "Female", "occupation": "Business", "city": "Bhimavaram", "id": "P145"}}, {"id": "P146", "label": "P146", "type": "Person", "color": "#ff6b6b", "x": 398.3095435806533, "y": 119.95586851003847, "information": {"type": "Person", "name": "Qasim Pillai", "age": "33", "gender": "Male", "occupation": "Student", "city": "Guntur", "id": "P146"}}, {"id": "P147", "label": "P147", "type": "Person", "color": "#ff6b6b", "x": 766.0108516379559, "y": 444.71800738981705, "information": {"type": "Person", "name": "Aashi Wali", "age": "47", "gender": "Female", "occupation": "Unknown", "city": "Visakhapatnam", "id": "P147"}}, {"id": "P148", "label": "P148", "type": "Person", "color": "#ff6b6b", "x": 1025.5680244848759, "y": 126.64709502495454, "information": {"type": "Person", "name": "Aarnav Ganguly", "age": "57", "gender": "Female", "occupation": "Unknown", "city": "Bhimavaram", "id": "P148"}}, {"id": "P149", "label": "P149", "type": "Person", "color": "#ff6b6b", "x": 80.0, "y": 420.95331307959106, "information": {"type": "Person", "name": "Tara Bahl", "age": "46", "gender": "Male", "occupation": "Mechanic", "city": "Visakhapatnam", "id": "P149"}}, {"id": "P150", "label": "P150", "type": "Person", "color": "#ff6b6b", "x": 520.6182618610351, "y": 461.2182358849861, "information": {"type": "Person", "name": "Ira Sengupta", "age": "46", "gender": "Female", "occupation": "Unknown", "city": "Guntur", "id": "P150"}}];
+
+const edges = [{"source": "P013", "target": "P063", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1526", "call_date": "2025-11-30"}}, {"source": "P013", "target": "P002", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "854", "call_date": "2025-11-15"}}, {"source": "P013", "target": "P028", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1348", "call_date": "2025-11-21"}}, {"source": "P013", "target": "P028", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "863", "call_date": "2026-03-07"}}, {"source": "P013", "target": "P028", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "795", "call_date": "2026-05-11"}}, {"source": "P013", "target": "P142", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "896", "call_date": "2026-05-19"}}, {"source": "P013", "target": "P098", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "803", "call_date": "2025-11-10"}}, {"source": "P013", "target": "P079", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1690", "call_date": "2025-11-17"}}, {"source": "P013", "target": "P038", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "733", "call_date": "2026-05-25"}}, {"source": "P013", "target": "P073", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "671", "call_date": "2026-06-20"}}, {"source": "P013", "target": "P005", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "744", "call_date": "2025-10-29"}}, {"source": "P013", "target": "P113", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1646", "call_date": "2026-07-05"}}, {"source": "P013", "target": "P032", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "929", "call_date": "2026-01-02"}}, {"source": "P013", "target": "P134", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1322", "call_date": "2025-10-11"}}, {"source": "P013", "target": "P145", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "52008.93", "transaction_date": "2026-01-04", "transaction_type": "Bank Transfer"}}, {"source": "P013", "target": "P096", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "57546.93", "transaction_date": "2025-12-08", "transaction_type": "NEFT"}}, {"source": "P013", "target": "P051", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "97963.3", "transaction_date": "2026-03-30", "transaction_type": "UPI"}}, {"source": "P013", "target": "P003", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "94705.32", "transaction_date": "2026-03-20", "transaction_type": "UPI"}}, {"source": "P013", "target": "P009", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "84191.57", "transaction_date": "2026-09-02", "transaction_type": "IMPS"}}, {"source": "P116", "target": "P014", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1782", "call_date": "2025-12-22"}}, {"source": "P116", "target": "P068", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "723", "call_date": "2026-04-23"}}, {"source": "P116", "target": "P020", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1307", "call_date": "2026-02-02"}}, {"source": "P116", "target": "P070", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "488", "call_date": "2025-09-23"}}, {"source": "P116", "target": "P070", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "513", "call_date": "2026-01-18"}}, {"source": "P116", "target": "P143", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1542", "call_date": "2026-01-19"}}, {"source": "P116", "target": "P143", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "71", "call_date": "2025-10-11"}}, {"source": "P116", "target": "P019", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1646", "call_date": "2025-09-27"}}, {"source": "P116", "target": "P030", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "209", "call_date": "2025-10-10"}}, {"source": "P116", "target": "P035", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "292", "call_date": "2026-06-18"}}, {"source": "P116", "target": "P027", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1271", "call_date": "2026-07-24"}}, {"source": "P116", "target": "P115", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "823", "call_date": "2025-12-24"}}, {"source": "P116", "target": "P121", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "56", "call_date": "2025-11-03"}}, {"source": "P116", "target": "P117", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1703", "call_date": "2026-02-03"}}, {"source": "P116", "target": "P007", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "376", "call_date": "2026-07-28"}}, {"source": "P116", "target": "P099", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "737", "call_date": "2025-10-04"}}, {"source": "P116", "target": "P005", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "85", "call_date": "2026-05-04"}}, {"source": "P116", "target": "P106", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "499", "call_date": "2026-02-09"}}, {"source": "P116", "target": "P125", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1036", "call_date": "2026-02-01"}}, {"source": "P116", "target": "P064", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "767", "call_date": "2026-05-24"}}, {"source": "P116", "target": "P120", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "895", "call_date": "2026-04-29"}}, {"source": "P116", "target": "P146", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1677", "call_date": "2026-03-16"}}, {"source": "P116", "target": "P033", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "63612.16", "transaction_date": "2026-04-15", "transaction_type": "UPI"}}, {"source": "P116", "target": "P042", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "18390.74", "transaction_date": "2026-05-10", "transaction_type": "UPI"}}, {"source": "P116", "target": "P043", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "89000.24", "transaction_date": "2026-05-25", "transaction_type": "IMPS"}}, {"source": "P116", "target": "P044", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "60342.35", "transaction_date": "2026-05-21", "transaction_type": "Bank Transfer"}}, {"source": "P116", "target": "P132", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "20700.56", "transaction_date": "2025-11-24", "transaction_type": "Bank Transfer"}}, {"source": "P116", "target": "P126", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "73614.09", "transaction_date": "2026-05-05", "transaction_type": "IMPS"}}, {"source": "P116", "target": "P039", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "65219.15", "transaction_date": "2025-12-23", "transaction_type": "UPI"}}, {"source": "P116", "target": "P039", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "29668.7", "transaction_date": "2025-09-27", "transaction_type": "Bank Transfer"}}, {"source": "P116", "target": "P055", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "45592.76", "transaction_date": "2026-04-19", "transaction_type": "IMPS"}}, {"source": "P116", "target": "P092", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "74348.17", "transaction_date": "2026-03-21", "transaction_type": "Bank Transfer"}}, {"source": "P116", "target": "P040", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "14637.25", "transaction_date": "2026-06-21", "transaction_type": "Bank Transfer"}}, {"source": "P116", "target": "P139", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "86249.1", "transaction_date": "2026-04-25", "transaction_type": "NEFT"}}, {"source": "P116", "target": "P036", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "65082.6", "transaction_date": "2025-12-17", "transaction_type": "IMPS"}}, {"source": "P136", "target": "P145", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "27", "call_date": "2026-02-16"}}, {"source": "P136", "target": "P110", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "479", "call_date": "2026-05-22"}}, {"source": "P136", "target": "P040", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "930", "call_date": "2026-06-07"}}, {"source": "P136", "target": "P079", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "693", "call_date": "2026-04-19"}}, {"source": "P136", "target": "P009", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "712", "call_date": "2026-08-25"}}, {"source": "P136", "target": "P025", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1277", "call_date": "2025-12-22"}}, {"source": "P136", "target": "P101", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "991", "call_date": "2026-01-09"}}, {"source": "P136", "target": "P101", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "89013.84", "transaction_date": "2025-10-17", "transaction_type": "NEFT"}}, {"source": "P136", "target": "P141", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "921", "call_date": "2025-11-14"}}, {"source": "P136", "target": "P108", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1622", "call_date": "2026-07-07"}}, {"source": "P136", "target": "P082", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "792", "call_date": "2026-02-13"}}, {"source": "P136", "target": "P090", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1444", "call_date": "2026-07-31"}}, {"source": "P136", "target": "P011", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1253", "call_date": "2026-03-23"}}, {"source": "P136", "target": "P132", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "324", "call_date": "2025-10-06"}}, {"source": "P136", "target": "P050", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "9058.82", "transaction_date": "2026-09-03", "transaction_type": "UPI"}}, {"source": "P136", "target": "P047", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "87850.02", "transaction_date": "2026-02-25", "transaction_type": "NEFT"}}, {"source": "P136", "target": "P021", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "88386.92", "transaction_date": "2025-12-13", "transaction_type": "NEFT"}}, {"source": "P136", "target": "P016", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "91341.73", "transaction_date": "2025-12-01", "transaction_type": "IMPS"}}, {"source": "P136", "target": "P002", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "65656.8", "transaction_date": "2026-05-15", "transaction_type": "IMPS"}}, {"source": "P136", "target": "P126", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "46537.58", "transaction_date": "2025-10-24", "transaction_type": "IMPS"}}, {"source": "P150", "target": "P147", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "33", "call_date": "2025-09-26"}}, {"source": "P150", "target": "P147", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1376", "call_date": "2026-02-19"}}, {"source": "P150", "target": "P098", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "185", "call_date": "2026-06-14"}}, {"source": "P150", "target": "P028", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "328", "call_date": "2026-03-07"}}, {"source": "P150", "target": "P060", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "336", "call_date": "2025-11-15"}}, {"source": "P150", "target": "P076", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "959", "call_date": "2026-04-01"}}, {"source": "P150", "target": "P149", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1281", "call_date": "2025-11-25"}}, {"source": "P150", "target": "P124", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1051", "call_date": "2026-06-01"}}, {"source": "P150", "target": "P065", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "545", "call_date": "2026-07-13"}}, {"source": "P150", "target": "P064", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "487", "call_date": "2026-03-11"}}, {"source": "P150", "target": "P135", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "99", "call_date": "2026-08-04"}}, {"source": "P150", "target": "P140", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "287", "call_date": "2026-04-19"}}, {"source": "P150", "target": "P101", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "954", "call_date": "2026-04-10"}}, {"source": "P150", "target": "P125", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "121", "call_date": "2025-09-08"}}, {"source": "P150", "target": "P007", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "941", "call_date": "2025-12-14"}}, {"source": "P150", "target": "P007", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1577", "call_date": "2026-06-25"}}, {"source": "P150", "target": "P100", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1660", "call_date": "2026-02-27"}}, {"source": "P150", "target": "P118", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "185", "call_date": "2026-02-25"}}, {"source": "P150", "target": "P055", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1205", "call_date": "2025-11-19"}}, {"source": "P150", "target": "P021", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1584", "call_date": "2026-04-05"}}, {"source": "P150", "target": "P093", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "99", "call_date": "2025-09-24"}}, {"source": "P150", "target": "P010", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "434", "call_date": "2026-04-12"}}, {"source": "P150", "target": "P011", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "962", "call_date": "2025-09-06"}}, {"source": "P150", "target": "P011", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "208", "call_date": "2025-11-27"}}, {"source": "P150", "target": "P115", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "793", "call_date": "2026-03-19"}}, {"source": "P150", "target": "P115", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "47771.19", "transaction_date": "2026-02-24", "transaction_type": "NEFT"}}, {"source": "P150", "target": "P138", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1471", "call_date": "2025-09-30"}}, {"source": "P150", "target": "P106", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "63871.91", "transaction_date": "2026-02-27", "transaction_type": "UPI"}}, {"source": "P150", "target": "P104", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "7223.21", "transaction_date": "2025-09-20", "transaction_type": "UPI"}}, {"source": "P150", "target": "P036", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "60751.79", "transaction_date": "2026-07-17", "transaction_type": "IMPS"}}, {"source": "P150", "target": "P061", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "63952.61", "transaction_date": "2026-08-04", "transaction_type": "Bank Transfer"}}, {"source": "P150", "target": "P084", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "53470.25", "transaction_date": "2026-08-17", "transaction_type": "NEFT"}}, {"source": "P057", "target": "P035", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "989", "call_date": "2025-12-09"}}, {"source": "P057", "target": "P038", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "43", "call_date": "2026-08-26"}}, {"source": "P057", "target": "P075", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "76", "call_date": "2026-01-08"}}, {"source": "P057", "target": "P137", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1317", "call_date": "2026-01-02"}}, {"source": "P057", "target": "P001", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "709", "call_date": "2026-06-08"}}, {"source": "P057", "target": "P048", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1076", "call_date": "2026-08-04"}}, {"source": "P057", "target": "P055", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1368", "call_date": "2026-05-10"}}, {"source": "P057", "target": "P055", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1762", "call_date": "2026-06-22"}}, {"source": "P057", "target": "P112", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "576", "call_date": "2026-03-07"}}, {"source": "P057", "target": "P125", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "484", "call_date": "2026-02-25"}}, {"source": "P057", "target": "P106", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1240", "call_date": "2025-10-08"}}, {"source": "P057", "target": "P148", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "272", "call_date": "2026-08-10"}}, {"source": "P057", "target": "P148", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "35437.87", "transaction_date": "2026-03-10", "transaction_type": "Bank Transfer"}}, {"source": "P057", "target": "P019", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "36", "call_date": "2026-08-16"}}, {"source": "P057", "target": "P019", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "974", "call_date": "2025-11-04"}}, {"source": "P057", "target": "P040", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "113", "call_date": "2026-04-21"}}, {"source": "P057", "target": "P111", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "603", "call_date": "2026-08-28"}}, {"source": "P057", "target": "P052", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1561", "call_date": "2026-01-06"}}, {"source": "P057", "target": "P052", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "935", "call_date": "2025-11-29"}}, {"source": "P057", "target": "P073", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "525", "call_date": "2025-09-14"}}, {"source": "P057", "target": "P017", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1657", "call_date": "2026-04-22"}}, {"source": "P057", "target": "P017", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "61332.93", "transaction_date": "2025-09-20", "transaction_type": "Bank Transfer"}}, {"source": "P057", "target": "P119", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1587", "call_date": "2026-03-08"}}, {"source": "P057", "target": "P039", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1184", "call_date": "2026-06-23"}}, {"source": "P057", "target": "P115", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "741", "call_date": "2025-10-24"}}, {"source": "P057", "target": "P072", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "410", "call_date": "2025-09-15"}}, {"source": "P057", "target": "P028", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "819", "call_date": "2025-12-28"}}, {"source": "P057", "target": "P076", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1460", "call_date": "2026-02-18"}}, {"source": "P057", "target": "P009", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "47581.19", "transaction_date": "2025-12-05", "transaction_type": "IMPS"}}, {"source": "P057", "target": "P051", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "26895.96", "transaction_date": "2026-04-21", "transaction_type": "NEFT"}}, {"source": "P057", "target": "P029", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "96310.44", "transaction_date": "2025-10-04", "transaction_type": "IMPS"}}, {"source": "P057", "target": "P082", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "7759.87", "transaction_date": "2026-02-23", "transaction_type": "NEFT"}}, {"source": "P057", "target": "P060", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "95021.62", "transaction_date": "2025-12-20", "transaction_type": "NEFT"}}, {"source": "P057", "target": "P044", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "80668.18", "transaction_date": "2026-06-30", "transaction_type": "Bank Transfer"}}, {"source": "P057", "target": "P062", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "46220.91", "transaction_date": "2026-08-21", "transaction_type": "NEFT"}}, {"source": "P057", "target": "P120", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "91555.83", "transaction_date": "2026-08-21", "transaction_type": "NEFT"}}, {"source": "P057", "target": "P064", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "46702.58", "transaction_date": "2026-05-27", "transaction_type": "NEFT"}}, {"source": "P110", "target": "P100", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "19", "call_date": "2026-08-22"}}, {"source": "P110", "target": "P081", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1630", "call_date": "2025-10-30"}}, {"source": "P110", "target": "P070", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1082", "call_date": "2026-08-06"}}, {"source": "P110", "target": "P123", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "795", "call_date": "2026-07-06"}}, {"source": "P110", "target": "P123", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "135", "call_date": "2025-11-27"}}, {"source": "P110", "target": "P104", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1599", "call_date": "2026-04-09"}}, {"source": "P110", "target": "P083", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "537", "call_date": "2025-09-18"}}, {"source": "P110", "target": "P064", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "517", "call_date": "2025-10-01"}}, {"source": "P110", "target": "P095", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "800", "call_date": "2026-06-30"}}, {"source": "P110", "target": "P049", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1764", "call_date": "2026-02-01"}}, {"source": "P110", "target": "P089", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "741", "call_date": "2026-02-21"}}, {"source": "P110", "target": "P054", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "721", "call_date": "2026-08-04"}}, {"source": "P110", "target": "P067", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "315", "call_date": "2025-11-08"}}, {"source": "P110", "target": "P024", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "92", "call_date": "2025-11-25"}}, {"source": "P110", "target": "P024", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "22614.17", "transaction_date": "2025-10-23", "transaction_type": "Bank Transfer"}}, {"source": "P110", "target": "P106", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "848", "call_date": "2026-01-12"}}, {"source": "P110", "target": "P063", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "104", "call_date": "2026-04-07"}}, {"source": "P110", "target": "P063", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1279", "call_date": "2025-12-26"}}, {"source": "P110", "target": "P063", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "45774.9", "transaction_date": "2026-07-22", "transaction_type": "Bank Transfer"}}, {"source": "P110", "target": "P065", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1426", "call_date": "2025-12-26"}}, {"source": "P110", "target": "P065", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "82534.62", "transaction_date": "2026-07-30", "transaction_type": "NEFT"}}, {"source": "P110", "target": "P087", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "769", "call_date": "2026-08-27"}}, {"source": "P110", "target": "P005", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1272", "call_date": "2026-04-02"}}, {"source": "P110", "target": "P048", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "36095.58", "transaction_date": "2026-01-25", "transaction_type": "UPI"}}, {"source": "P110", "target": "P015", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "80835.97", "transaction_date": "2026-04-12", "transaction_type": "Bank Transfer"}}, {"source": "P110", "target": "P032", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "10810.49", "transaction_date": "2025-11-24", "transaction_type": "IMPS"}}, {"source": "P110", "target": "P102", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "80703.45", "transaction_date": "2026-02-28", "transaction_type": "UPI"}}, {"source": "P110", "target": "P039", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "26255.87", "transaction_date": "2026-05-02", "transaction_type": "NEFT"}}, {"source": "P110", "target": "P007", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "96492.98", "transaction_date": "2026-04-17", "transaction_type": "NEFT"}}, {"source": "P110", "target": "P029", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "68837.33", "transaction_date": "2026-06-15", "transaction_type": "UPI"}}, {"source": "P110", "target": "P021", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "33213.1", "transaction_date": "2026-06-30", "transaction_type": "NEFT"}}, {"source": "P147", "target": "P138", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "316", "call_date": "2026-08-18"}}, {"source": "P147", "target": "P138", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1085", "call_date": "2026-03-12"}}, {"source": "P147", "target": "P134", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "357", "call_date": "2026-04-10"}}, {"source": "P147", "target": "P111", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1692", "call_date": "2025-10-08"}}, {"source": "P147", "target": "P141", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1730", "call_date": "2026-03-04"}}, {"source": "P147", "target": "P141", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "743", "call_date": "2025-12-14"}}, {"source": "P147", "target": "P049", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "712", "call_date": "2026-01-20"}}, {"source": "P147", "target": "P127", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "315", "call_date": "2026-02-06"}}, {"source": "P147", "target": "P042", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "285", "call_date": "2026-08-29"}}, {"source": "P147", "target": "P104", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1748", "call_date": "2025-09-22"}}, {"source": "P147", "target": "P103", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1175", "call_date": "2026-07-09"}}, {"source": "P147", "target": "P013", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1132", "call_date": "2026-05-25"}}, {"source": "P147", "target": "P040", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "883", "call_date": "2025-11-13"}}, {"source": "P147", "target": "P040", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "32714.66", "transaction_date": "2026-01-06", "transaction_type": "NEFT"}}, {"source": "P147", "target": "P136", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "189", "call_date": "2026-08-12"}}, {"source": "P147", "target": "P014", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1354", "call_date": "2026-02-08"}}, {"source": "P147", "target": "P038", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1647", "call_date": "2025-11-25"}}, {"source": "P147", "target": "P100", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "670", "call_date": "2026-07-31"}}, {"source": "P147", "target": "P100", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "80588.94", "transaction_date": "2026-01-17", "transaction_type": "Bank Transfer"}}, {"source": "P147", "target": "P026", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1665", "call_date": "2025-11-12"}}, {"source": "P147", "target": "P129", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "257", "call_date": "2025-10-13"}}, {"source": "P147", "target": "P058", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "52", "call_date": "2025-10-12"}}, {"source": "P147", "target": "P047", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "862", "call_date": "2025-10-10"}}, {"source": "P147", "target": "P036", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1472", "call_date": "2025-11-17"}}, {"source": "P147", "target": "P036", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "97734.58", "transaction_date": "2026-06-11", "transaction_type": "NEFT"}}, {"source": "P147", "target": "P041", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1735", "call_date": "2025-11-24"}}, {"source": "P147", "target": "P101", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "790", "call_date": "2026-01-14"}}, {"source": "P147", "target": "P089", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1677", "call_date": "2026-07-03"}}, {"source": "P147", "target": "P123", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1302", "call_date": "2025-10-09"}}, {"source": "P147", "target": "P123", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "570", "call_date": "2026-06-04"}}, {"source": "P147", "target": "P033", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "213", "call_date": "2026-06-17"}}, {"source": "P147", "target": "P073", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1139", "call_date": "2025-09-07"}}, {"source": "P147", "target": "P098", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "3016.34", "transaction_date": "2025-12-22", "transaction_type": "NEFT"}}, {"source": "P147", "target": "P096", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "82999.22", "transaction_date": "2026-07-23", "transaction_type": "Bank Transfer"}}, {"source": "P147", "target": "P043", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "53833.3", "transaction_date": "2026-01-01", "transaction_type": "UPI"}}, {"source": "P147", "target": "P008", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "86386.94", "transaction_date": "2025-11-26", "transaction_type": "Bank Transfer"}}, {"source": "P147", "target": "P075", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "18272.93", "transaction_date": "2026-05-04", "transaction_type": "NEFT"}}, {"source": "P147", "target": "P120", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "61198.13", "transaction_date": "2026-05-06", "transaction_type": "NEFT"}}, {"source": "P147", "target": "P048", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "66631.77", "transaction_date": "2025-12-18", "transaction_type": "Bank Transfer"}}, {"source": "P147", "target": "P069", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "92821.23", "transaction_date": "2026-03-08", "transaction_type": "IMPS"}}, {"source": "P147", "target": "P072", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "46509.32", "transaction_date": "2026-05-02", "transaction_type": "Bank Transfer"}}, {"source": "P101", "target": "P030", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "722", "call_date": "2026-03-05"}}, {"source": "P101", "target": "P076", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1333", "call_date": "2026-06-25"}}, {"source": "P101", "target": "P017", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "645", "call_date": "2026-04-06"}}, {"source": "P101", "target": "P020", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1222", "call_date": "2026-01-18"}}, {"source": "P101", "target": "P084", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "661", "call_date": "2025-12-28"}}, {"source": "P101", "target": "P056", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "946", "call_date": "2026-03-29"}}, {"source": "P101", "target": "P140", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "614", "call_date": "2025-11-08"}}, {"source": "P101", "target": "P138", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1131", "call_date": "2026-05-26"}}, {"source": "P101", "target": "P058", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1591", "call_date": "2025-09-20"}}, {"source": "P101", "target": "P045", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "946", "call_date": "2026-03-15"}}, {"source": "P101", "target": "P115", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1551", "call_date": "2026-07-12"}}, {"source": "P101", "target": "P038", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "280", "call_date": "2025-12-05"}}, {"source": "P101", "target": "P036", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "189", "call_date": "2026-03-12"}}, {"source": "P101", "target": "P106", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "672", "call_date": "2026-02-11"}}, {"source": "P101", "target": "P046", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1453", "call_date": "2026-03-22"}}, {"source": "P101", "target": "P046", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1331", "call_date": "2025-11-18"}}, {"source": "P101", "target": "P046", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "600", "call_date": "2026-07-03"}}, {"source": "P101", "target": "P050", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1014", "call_date": "2026-06-02"}}, {"source": "P101", "target": "P050", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "695", "call_date": "2026-05-10"}}, {"source": "P101", "target": "P050", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "25233.04", "transaction_date": "2025-12-05", "transaction_type": "IMPS"}}, {"source": "P101", "target": "P068", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1023", "call_date": "2025-12-16"}}, {"source": "P101", "target": "P010", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1362", "call_date": "2025-11-18"}}, {"source": "P101", "target": "P044", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "168", "call_date": "2025-10-01"}}, {"source": "P101", "target": "P087", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "875", "call_date": "2026-08-20"}}, {"source": "P101", "target": "P019", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1091", "call_date": "2025-10-24"}}, {"source": "P101", "target": "P049", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "7410.68", "transaction_date": "2025-11-30", "transaction_type": "UPI"}}, {"source": "P101", "target": "P048", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "82339.24", "transaction_date": "2025-09-03", "transaction_type": "UPI"}}, {"source": "P101", "target": "P092", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "97398.15", "transaction_date": "2026-03-06", "transaction_type": "UPI"}}, {"source": "P101", "target": "P014", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "80232.5", "transaction_date": "2026-08-06", "transaction_type": "Bank Transfer"}}, {"source": "P101", "target": "P027", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "58573.0", "transaction_date": "2026-08-14", "transaction_type": "IMPS"}}, {"source": "P101", "target": "P026", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "22378.89", "transaction_date": "2025-11-06", "transaction_type": "IMPS"}}, {"source": "P101", "target": "P033", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "40592.74", "transaction_date": "2025-09-22", "transaction_type": "UPI"}}, {"source": "P101", "target": "P015", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "92641.42", "transaction_date": "2025-09-15", "transaction_type": "IMPS"}}, {"source": "P101", "target": "P137", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "7629.85", "transaction_date": "2025-10-01", "transaction_type": "Bank Transfer"}}, {"source": "P101", "target": "P011", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "35056.79", "transaction_date": "2025-09-21", "transaction_type": "Bank Transfer"}}, {"source": "P101", "target": "P098", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "15733.2", "transaction_date": "2025-10-07", "transaction_type": "IMPS"}}, {"source": "P101", "target": "P031", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "65221.03", "transaction_date": "2025-11-28", "transaction_type": "Bank Transfer"}}, {"source": "P101", "target": "P043", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "92121.49", "transaction_date": "2026-03-06", "transaction_type": "Bank Transfer"}}, {"source": "P101", "target": "P116", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "60840.43", "transaction_date": "2026-08-19", "transaction_type": "NEFT"}}, {"source": "P052", "target": "P123", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "653", "call_date": "2025-12-21"}}, {"source": "P052", "target": "P034", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1341", "call_date": "2025-09-15"}}, {"source": "P052", "target": "P135", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "520", "call_date": "2026-05-05"}}, {"source": "P052", "target": "P015", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "520", "call_date": "2026-01-08"}}, {"source": "P052", "target": "P096", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "38", "call_date": "2026-05-19"}}, {"source": "P052", "target": "P068", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1712", "call_date": "2025-11-11"}}, {"source": "P052", "target": "P133", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "595", "call_date": "2026-06-29"}}, {"source": "P052", "target": "P133", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "41", "call_date": "2026-04-01"}}, {"source": "P052", "target": "P061", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1516", "call_date": "2025-12-18"}}, {"source": "P052", "target": "P036", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "642", "call_date": "2025-10-09"}}, {"source": "P052", "target": "P001", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1285", "call_date": "2026-08-24"}}, {"source": "P052", "target": "P073", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "531", "call_date": "2026-03-08"}}, {"source": "P052", "target": "P024", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "918", "call_date": "2026-07-30"}}, {"source": "P052", "target": "P024", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1780", "call_date": "2026-08-10"}}, {"source": "P052", "target": "P050", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "596", "call_date": "2025-10-04"}}, {"source": "P052", "target": "P046", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1145", "call_date": "2026-08-08"}}, {"source": "P052", "target": "P046", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "97938.18", "transaction_date": "2026-04-12", "transaction_type": "IMPS"}}, {"source": "P052", "target": "P110", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "700", "call_date": "2025-11-30"}}, {"source": "P052", "target": "P086", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "270", "call_date": "2026-01-18"}}, {"source": "P052", "target": "P086", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "88858.79", "transaction_date": "2026-06-18", "transaction_type": "UPI"}}, {"source": "P052", "target": "P048", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1383", "call_date": "2026-03-07"}}, {"source": "P052", "target": "P104", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "261", "call_date": "2026-02-05"}}, {"source": "P052", "target": "P128", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1311", "call_date": "2025-12-18"}}, {"source": "P052", "target": "P079", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "652", "call_date": "2026-04-20"}}, {"source": "P052", "target": "P126", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "922", "call_date": "2026-07-27"}}, {"source": "P052", "target": "P113", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "861", "call_date": "2026-08-27"}}, {"source": "P052", "target": "P062", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1550", "call_date": "2026-05-09"}}, {"source": "P052", "target": "P018", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "709", "call_date": "2025-10-25"}}, {"source": "P052", "target": "P129", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1477", "call_date": "2026-02-24"}}, {"source": "P052", "target": "P039", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "779", "call_date": "2026-07-01"}}, {"source": "P052", "target": "P070", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1776", "call_date": "2026-05-21"}}, {"source": "P052", "target": "P146", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "35615.09", "transaction_date": "2025-11-13", "transaction_type": "UPI"}}, {"source": "P052", "target": "P054", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "66374.44", "transaction_date": "2025-12-09", "transaction_type": "IMPS"}}, {"source": "P052", "target": "P078", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "16747.25", "transaction_date": "2025-09-23", "transaction_type": "IMPS"}}, {"source": "P052", "target": "P072", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "5366.76", "transaction_date": "2026-02-10", "transaction_type": "Bank Transfer"}}, {"source": "P052", "target": "P033", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "52063.44", "transaction_date": "2026-01-22", "transaction_type": "UPI"}}, {"source": "P052", "target": "P121", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "38311.68", "transaction_date": "2026-08-10", "transaction_type": "UPI"}}, {"source": "P052", "target": "P010", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "21279.24", "transaction_date": "2025-11-29", "transaction_type": "Bank Transfer"}}, {"source": "P045", "target": "P110", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1148", "call_date": "2026-01-14"}}, {"source": "P045", "target": "P142", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "337", "call_date": "2026-01-28"}}, {"source": "P045", "target": "P077", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1268", "call_date": "2025-10-21"}}, {"source": "P045", "target": "P143", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "351", "call_date": "2025-11-15"}}, {"source": "P045", "target": "P143", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "956", "call_date": "2026-04-10"}}, {"source": "P045", "target": "P031", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "35", "call_date": "2025-12-15"}}, {"source": "P045", "target": "P008", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "838", "call_date": "2025-12-11"}}, {"source": "P045", "target": "P046", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "494", "call_date": "2026-04-29"}}, {"source": "P045", "target": "P097", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "638", "call_date": "2026-07-06"}}, {"source": "P045", "target": "P097", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1598", "call_date": "2025-10-26"}}, {"source": "P045", "target": "P050", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1715", "call_date": "2025-10-16"}}, {"source": "P045", "target": "P050", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "686", "call_date": "2026-08-14"}}, {"source": "P045", "target": "P003", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "468", "call_date": "2025-10-09"}}, {"source": "P045", "target": "P105", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1046", "call_date": "2026-04-03"}}, {"source": "P045", "target": "P067", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1612", "call_date": "2026-07-18"}}, {"source": "P045", "target": "P010", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1231", "call_date": "2026-07-19"}}, {"source": "P045", "target": "P144", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1453", "call_date": "2026-02-21"}}, {"source": "P045", "target": "P052", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "330", "call_date": "2026-05-10"}}, {"source": "P045", "target": "P106", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1148", "call_date": "2026-08-06"}}, {"source": "P045", "target": "P107", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "520", "call_date": "2026-08-28"}}, {"source": "P045", "target": "P066", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "789", "call_date": "2025-12-26"}}, {"source": "P045", "target": "P083", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "11212.27", "transaction_date": "2026-05-01", "transaction_type": "Bank Transfer"}}, {"source": "P045", "target": "P001", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "31460.87", "transaction_date": "2026-08-30", "transaction_type": "IMPS"}}, {"source": "P045", "target": "P022", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "53731.03", "transaction_date": "2026-06-29", "transaction_type": "NEFT"}}, {"source": "P045", "target": "P121", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "93745.52", "transaction_date": "2026-07-09", "transaction_type": "NEFT"}}, {"source": "P045", "target": "P049", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "63829.94", "transaction_date": "2026-04-03", "transaction_type": "Bank Transfer"}}, {"source": "P045", "target": "P004", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "11702.38", "transaction_date": "2026-03-31", "transaction_type": "NEFT"}}, {"source": "P045", "target": "P057", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "28307.33", "transaction_date": "2025-09-19", "transaction_type": "UPI"}}, {"source": "P045", "target": "P029", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "71486.25", "transaction_date": "2026-05-25", "transaction_type": "NEFT"}}, {"source": "P062", "target": "P050", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1279", "call_date": "2026-02-16"}}, {"source": "P062", "target": "P050", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1074", "call_date": "2026-07-19"}}, {"source": "P062", "target": "P146", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1719", "call_date": "2026-04-08"}}, {"source": "P062", "target": "P069", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1102", "call_date": "2025-10-23"}}, {"source": "P062", "target": "P069", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "8961.42", "transaction_date": "2026-08-06", "transaction_type": "UPI"}}, {"source": "P062", "target": "P068", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "433", "call_date": "2026-01-15"}}, {"source": "P062", "target": "P133", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1575", "call_date": "2025-10-09"}}, {"source": "P062", "target": "P145", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1127", "call_date": "2026-02-26"}}, {"source": "P062", "target": "P145", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "19531.02", "transaction_date": "2026-05-27", "transaction_type": "IMPS"}}, {"source": "P062", "target": "P126", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "806", "call_date": "2025-09-15"}}, {"source": "P062", "target": "P022", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1153", "call_date": "2026-07-20"}}, {"source": "P062", "target": "P024", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "42", "call_date": "2025-12-13"}}, {"source": "P062", "target": "P024", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "348", "call_date": "2026-01-30"}}, {"source": "P062", "target": "P139", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "242", "call_date": "2026-01-04"}}, {"source": "P062", "target": "P039", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1538", "call_date": "2026-03-19"}}, {"source": "P062", "target": "P065", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1141", "call_date": "2025-09-13"}}, {"source": "P062", "target": "P112", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1734", "call_date": "2026-07-02"}}, {"source": "P062", "target": "P112", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "61724.42", "transaction_date": "2026-07-12", "transaction_type": "Bank Transfer"}}, {"source": "P062", "target": "P093", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1372", "call_date": "2026-02-19"}}, {"source": "P062", "target": "P054", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "99702.45", "transaction_date": "2026-04-30", "transaction_type": "UPI"}}, {"source": "P062", "target": "P143", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "97362.29", "transaction_date": "2026-08-30", "transaction_type": "NEFT"}}, {"source": "P062", "target": "P114", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "73413.43", "transaction_date": "2026-06-30", "transaction_type": "Bank Transfer"}}, {"source": "P062", "target": "P144", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "39628.04", "transaction_date": "2026-08-18", "transaction_type": "Bank Transfer"}}, {"source": "P062", "target": "P079", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "26679.78", "transaction_date": "2026-06-19", "transaction_type": "Bank Transfer"}}, {"source": "P062", "target": "P079", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "43801.73", "transaction_date": "2026-06-05", "transaction_type": "Bank Transfer"}}, {"source": "P062", "target": "P104", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "30634.33", "transaction_date": "2026-07-26", "transaction_type": "NEFT"}}, {"source": "P062", "target": "P121", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "3917.04", "transaction_date": "2026-03-13", "transaction_type": "IMPS"}}, {"source": "P062", "target": "P102", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "723.92", "transaction_date": "2026-04-27", "transaction_type": "UPI"}}, {"source": "P062", "target": "P017", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "77977.15", "transaction_date": "2025-12-23", "transaction_type": "IMPS"}}, {"source": "P044", "target": "P148", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1575", "call_date": "2026-06-26"}}, {"source": "P044", "target": "P148", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1142", "call_date": "2026-07-29"}}, {"source": "P044", "target": "P008", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "81", "call_date": "2025-11-16"}}, {"source": "P044", "target": "P086", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1168", "call_date": "2026-03-29"}}, {"source": "P044", "target": "P017", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1684", "call_date": "2026-06-09"}}, {"source": "P044", "target": "P088", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "460", "call_date": "2026-01-22"}}, {"source": "P044", "target": "P138", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "18", "call_date": "2025-11-26"}}, {"source": "P044", "target": "P013", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "831", "call_date": "2026-07-20"}}, {"source": "P044", "target": "P131", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1694", "call_date": "2025-11-14"}}, {"source": "P044", "target": "P131", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "74295.64", "transaction_date": "2026-04-12", "transaction_type": "NEFT"}}, {"source": "P044", "target": "P016", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1268", "call_date": "2025-10-03"}}, {"source": "P044", "target": "P063", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1110", "call_date": "2026-01-29"}}, {"source": "P044", "target": "P135", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1646", "call_date": "2025-12-13"}}, {"source": "P044", "target": "P135", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "48464.22", "transaction_date": "2026-02-06", "transaction_type": "Bank Transfer"}}, {"source": "P044", "target": "P015", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "206", "call_date": "2025-09-15"}}, {"source": "P044", "target": "P082", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1549", "call_date": "2026-08-25"}}, {"source": "P044", "target": "P058", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "103", "call_date": "2026-02-28"}}, {"source": "P044", "target": "P074", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "93950.89", "transaction_date": "2025-12-10", "transaction_type": "IMPS"}}, {"source": "P044", "target": "P094", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "51875.87", "transaction_date": "2026-06-28", "transaction_type": "Bank Transfer"}}, {"source": "P044", "target": "P094", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "85199.66", "transaction_date": "2026-03-03", "transaction_type": "NEFT"}}, {"source": "P044", "target": "P003", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "22143.82", "transaction_date": "2026-02-11", "transaction_type": "IMPS"}}, {"source": "P044", "target": "P010", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "94991.68", "transaction_date": "2026-06-30", "transaction_type": "Bank Transfer"}}, {"source": "P044", "target": "P101", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "82507.0", "transaction_date": "2026-07-30", "transaction_type": "Bank Transfer"}}, {"source": "P044", "target": "P075", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "67345.18", "transaction_date": "2026-07-28", "transaction_type": "Bank Transfer"}}, {"source": "P119", "target": "P079", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1491", "call_date": "2026-06-12"}}, {"source": "P119", "target": "P079", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "938", "call_date": "2026-07-18"}}, {"source": "P119", "target": "P140", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "878", "call_date": "2026-02-27"}}, {"source": "P119", "target": "P054", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "907", "call_date": "2025-10-24"}}, {"source": "P119", "target": "P054", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "93652.15", "transaction_date": "2026-03-27", "transaction_type": "NEFT"}}, {"source": "P119", "target": "P129", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "318", "call_date": "2025-10-30"}}, {"source": "P119", "target": "P060", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1643", "call_date": "2026-05-02"}}, {"source": "P119", "target": "P068", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1755", "call_date": "2026-06-11"}}, {"source": "P119", "target": "P027", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1656", "call_date": "2025-12-21"}}, {"source": "P119", "target": "P013", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "354", "call_date": "2026-03-30"}}, {"source": "P119", "target": "P009", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "686", "call_date": "2025-10-15"}}, {"source": "P119", "target": "P116", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "195", "call_date": "2025-10-22"}}, {"source": "P119", "target": "P044", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "588", "call_date": "2025-10-19"}}, {"source": "P119", "target": "P103", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1219", "call_date": "2026-01-21"}}, {"source": "P119", "target": "P084", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1146", "call_date": "2026-06-01"}}, {"source": "P119", "target": "P072", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "39", "call_date": "2025-09-08"}}, {"source": "P119", "target": "P036", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1800", "call_date": "2026-07-17"}}, {"source": "P119", "target": "P058", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "64", "call_date": "2026-07-11"}}, {"source": "P119", "target": "P035", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "741", "call_date": "2026-07-26"}}, {"source": "P119", "target": "P146", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1674", "call_date": "2026-05-03"}}, {"source": "P119", "target": "P046", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1620", "call_date": "2026-03-04"}}, {"source": "P119", "target": "P142", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "843", "call_date": "2026-07-04"}}, {"source": "P119", "target": "P075", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1347", "call_date": "2026-04-15"}}, {"source": "P119", "target": "P095", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "405", "call_date": "2025-12-05"}}, {"source": "P119", "target": "P110", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1280", "call_date": "2026-08-25"}}, {"source": "P119", "target": "P148", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "90", "call_date": "2025-11-29"}}, {"source": "P119", "target": "P098", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "713", "call_date": "2026-04-13"}}, {"source": "P119", "target": "P125", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "954", "call_date": "2025-09-08"}}, {"source": "P119", "target": "P021", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "88577.79", "transaction_date": "2026-02-14", "transaction_type": "UPI"}}, {"source": "P119", "target": "P028", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "74630.09", "transaction_date": "2025-09-11", "transaction_type": "NEFT"}}, {"source": "P119", "target": "P133", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "46291.96", "transaction_date": "2026-07-07", "transaction_type": "UPI"}}, {"source": "P119", "target": "P045", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "68493.5", "transaction_date": "2026-07-15", "transaction_type": "UPI"}}, {"source": "P119", "target": "P026", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "53924.9", "transaction_date": "2025-09-21", "transaction_type": "UPI"}}, {"source": "P119", "target": "P052", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "90205.5", "transaction_date": "2025-12-04", "transaction_type": "UPI"}}, {"source": "P119", "target": "P094", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "34111.23", "transaction_date": "2025-10-29", "transaction_type": "Bank Transfer"}}, {"source": "P119", "target": "P141", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "86312.65", "transaction_date": "2026-08-13", "transaction_type": "Bank Transfer"}}, {"source": "P119", "target": "P071", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "69864.54", "transaction_date": "2026-05-29", "transaction_type": "Bank Transfer"}}, {"source": "P119", "target": "P088", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "30697.94", "transaction_date": "2026-04-23", "transaction_type": "IMPS"}}, {"source": "P104", "target": "P110", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1065", "call_date": "2026-08-30"}}, {"source": "P104", "target": "P118", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1167", "call_date": "2025-10-06"}}, {"source": "P104", "target": "P098", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "782", "call_date": "2026-06-02"}}, {"source": "P104", "target": "P048", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "391", "call_date": "2025-11-06"}}, {"source": "P104", "target": "P048", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1627", "call_date": "2025-11-24"}}, {"source": "P104", "target": "P082", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1404", "call_date": "2026-05-01"}}, {"source": "P104", "target": "P082", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "51969.07", "transaction_date": "2026-07-17", "transaction_type": "Bank Transfer"}}, {"source": "P104", "target": "P005", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "477", "call_date": "2025-11-09"}}, {"source": "P104", "target": "P024", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "725", "call_date": "2026-03-16"}}, {"source": "P104", "target": "P111", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "657", "call_date": "2025-09-25"}}, {"source": "P104", "target": "P091", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1683", "call_date": "2026-02-10"}}, {"source": "P104", "target": "P145", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1315", "call_date": "2026-07-20"}}, {"source": "P104", "target": "P018", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1116", "call_date": "2025-09-15"}}, {"source": "P104", "target": "P128", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1583", "call_date": "2026-03-05"}}, {"source": "P104", "target": "P125", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1057", "call_date": "2025-11-15"}}, {"source": "P104", "target": "P125", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "630", "call_date": "2026-04-30"}}, {"source": "P104", "target": "P073", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1335", "call_date": "2026-06-30"}}, {"source": "P104", "target": "P051", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "627", "call_date": "2026-03-05"}}, {"source": "P104", "target": "P138", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "623", "call_date": "2026-02-27"}}, {"source": "P104", "target": "P063", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "79", "call_date": "2026-07-31"}}, {"source": "P104", "target": "P123", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1223", "call_date": "2026-09-03"}}, {"source": "P104", "target": "P124", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "98278.28", "transaction_date": "2025-11-14", "transaction_type": "NEFT"}}, {"source": "P104", "target": "P004", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "16507.94", "transaction_date": "2026-07-31", "transaction_type": "NEFT"}}, {"source": "P104", "target": "P015", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "96883.66", "transaction_date": "2026-01-24", "transaction_type": "IMPS"}}, {"source": "P104", "target": "P096", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "90943.59", "transaction_date": "2026-05-16", "transaction_type": "IMPS"}}, {"source": "P104", "target": "P081", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "62369.07", "transaction_date": "2025-12-29", "transaction_type": "NEFT"}}, {"source": "P104", "target": "P112", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "38018.16", "transaction_date": "2025-09-20", "transaction_type": "Bank Transfer"}}, {"source": "P104", "target": "P119", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "86933.89", "transaction_date": "2026-05-15", "transaction_type": "Bank Transfer"}}, {"source": "P104", "target": "P139", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "11135.65", "transaction_date": "2025-12-29", "transaction_type": "NEFT"}}, {"source": "P126", "target": "P118", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "354", "call_date": "2025-11-18"}}, {"source": "P126", "target": "P136", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1318", "call_date": "2026-01-15"}}, {"source": "P126", "target": "P074", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "297", "call_date": "2026-08-27"}}, {"source": "P126", "target": "P107", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1464", "call_date": "2026-08-12"}}, {"source": "P126", "target": "P107", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1697", "call_date": "2026-06-15"}}, {"source": "P126", "target": "P040", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "121", "call_date": "2026-06-11"}}, {"source": "P126", "target": "P026", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1789", "call_date": "2025-09-07"}}, {"source": "P126", "target": "P026", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1424", "call_date": "2026-04-08"}}, {"source": "P126", "target": "P026", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1635", "call_date": "2026-01-27"}}, {"source": "P126", "target": "P115", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "373", "call_date": "2026-06-10"}}, {"source": "P126", "target": "P083", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "503", "call_date": "2026-01-31"}}, {"source": "P126", "target": "P123", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "623", "call_date": "2025-12-15"}}, {"source": "P126", "target": "P123", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "903", "call_date": "2025-11-02"}}, {"source": "P126", "target": "P049", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "666", "call_date": "2025-12-29"}}, {"source": "P126", "target": "P049", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1170", "call_date": "2026-08-26"}}, {"source": "P126", "target": "P101", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1534", "call_date": "2025-10-30"}}, {"source": "P126", "target": "P101", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1112", "call_date": "2026-02-23"}}, {"source": "P126", "target": "P028", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "304", "call_date": "2025-12-02"}}, {"source": "P126", "target": "P063", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "68", "call_date": "2026-06-23"}}, {"source": "P126", "target": "P027", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "821", "call_date": "2025-10-14"}}, {"source": "P126", "target": "P142", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1413", "call_date": "2025-10-07"}}, {"source": "P126", "target": "P039", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1148", "call_date": "2026-01-02"}}, {"source": "P126", "target": "P111", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1517", "call_date": "2025-12-15"}}, {"source": "P126", "target": "P111", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "70569.67", "transaction_date": "2026-02-08", "transaction_type": "NEFT"}}, {"source": "P126", "target": "P054", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1499", "call_date": "2025-09-09"}}, {"source": "P126", "target": "P018", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "404", "call_date": "2025-09-24"}}, {"source": "P126", "target": "P095", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1436", "call_date": "2026-01-27"}}, {"source": "P126", "target": "P001", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "208", "call_date": "2025-11-10"}}, {"source": "P126", "target": "P024", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1639", "call_date": "2026-05-13"}}, {"source": "P126", "target": "P078", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1418", "call_date": "2026-08-05"}}, {"source": "P126", "target": "P051", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "183", "call_date": "2026-04-09"}}, {"source": "P126", "target": "P141", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1024", "call_date": "2026-02-22"}}, {"source": "P126", "target": "P072", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "32530.18", "transaction_date": "2026-05-12", "transaction_type": "Bank Transfer"}}, {"source": "P126", "target": "P143", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "61316.11", "transaction_date": "2026-06-07", "transaction_type": "NEFT"}}, {"source": "P126", "target": "P065", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "34842.05", "transaction_date": "2025-11-17", "transaction_type": "Bank Transfer"}}, {"source": "P126", "target": "P082", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "90628.76", "transaction_date": "2026-02-21", "transaction_type": "UPI"}}, {"source": "P126", "target": "P102", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "59048.11", "transaction_date": "2026-08-26", "transaction_type": "Bank Transfer"}}, {"source": "P019", "target": "P012", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "877", "call_date": "2025-09-23"}}, {"source": "P019", "target": "P049", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1657", "call_date": "2026-05-20"}}, {"source": "P019", "target": "P022", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "558", "call_date": "2025-11-16"}}, {"source": "P019", "target": "P059", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "794", "call_date": "2026-03-15"}}, {"source": "P019", "target": "P088", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "358", "call_date": "2026-04-19"}}, {"source": "P019", "target": "P121", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "408", "call_date": "2025-09-23"}}, {"source": "P019", "target": "P082", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1086", "call_date": "2025-10-23"}}, {"source": "P019", "target": "P014", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "374", "call_date": "2026-07-27"}}, {"source": "P019", "target": "P092", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1039", "call_date": "2025-12-03"}}, {"source": "P019", "target": "P092", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "71", "call_date": "2025-09-12"}}, {"source": "P019", "target": "P021", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "341", "call_date": "2026-06-30"}}, {"source": "P019", "target": "P078", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1101", "call_date": "2025-12-13"}}, {"source": "P019", "target": "P005", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "304", "call_date": "2026-03-24"}}, {"source": "P019", "target": "P147", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "1500", "call_date": "2026-07-14"}}, {"source": "P019", "target": "P058", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "39128.19", "transaction_date": "2025-12-16", "transaction_type": "Bank Transfer"}}, {"source": "P019", "target": "P058", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "96354.06", "transaction_date": "2025-10-01", "transaction_type": "IMPS"}}, {"source": "P019", "target": "P146", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "8275.31", "transaction_date": "2025-09-29", "transaction_type": "IMPS"}}, {"source": "P019", "target": "P110", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "87647.39", "transaction_date": "2026-06-06", "transaction_type": "NEFT"}}, {"source": "P019", "target": "P118", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "89969.93", "transaction_date": "2025-12-04", "transaction_type": "Bank Transfer"}}, {"source": "P019", "target": "P111", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "81866.7", "transaction_date": "2026-06-20", "transaction_type": "Bank Transfer"}}, {"source": "P019", "target": "P030", "relationship": "TRANSFERRED_MONEY", "color": "#ff6b6b", "information": {"relationship": "TRANSFERRED_MONEY", "amount": "11970.2", "transaction_date": "2026-01-06", "transaction_type": "Bank Transfer"}}, {"source": "P007", "target": "P053", "relationship": "CALLED", "color": "#ff6b6b", "information": {"relationship": "CALLED", "duration_seconds": "359", "call_date": "2025-10-12"}}];
+
+
+const svg =
+document.getElementById("graph");
+
+
+const nodeMap = {};
+
+nodes.forEach(n => {
+
+    nodeMap[n.id] = n;
+
+});
+
+
+const NS =
+"http://www.w3.org/2000/svg";
+
+
+// ============================================================
+// DRAW EDGES
+// ============================================================
+
+edges.forEach(edge => {
+
+    const source =
+        nodeMap[edge.source];
+
+    const target =
+        nodeMap[edge.target];
+
+    if (!source || !target) {
+        return;
+    }
+
+
+    const line =
+        document.createElementNS(
+            NS,
+            "line"
+        );
+
+
+    line.setAttribute(
+        "x1",
+        source.x
+    );
+
+    line.setAttribute(
+        "y1",
+        source.y
+    );
+
+    line.setAttribute(
+        "x2",
+        target.x
+    );
+
+    line.setAttribute(
+        "y2",
+        target.y
+    );
+
+
+    line.setAttribute(
+        "stroke",
+        edge.color
+    );
+
+
+    line.setAttribute(
+        "stroke-width",
+        "0.7"
+    );
+
+
+    line.setAttribute(
+        "opacity",
+        "0.45"
+    );
+
+
+    line.classList.add("edge");
+
+
+    svg.appendChild(line);
+
+});
+
+
+// ============================================================
+// DRAW NODES
+// ============================================================
+
+nodes.forEach(node => {
+
+    const group =
+        document.createElementNS(
+            NS,
+            "g"
+        );
+
+
+    group.classList.add("node");
+
+
+    const circle =
+        document.createElementNS(
+            NS,
+            "circle"
+        );
+
+
+    circle.setAttribute(
+        "cx",
+        node.x
+    );
+
+
+    circle.setAttribute(
+        "cy",
+        node.y
+    );
+
+
+    circle.setAttribute(
+        "r",
+        node.type === "Person"
+            ? 8
+            : 6
+    );
+
+
+    circle.setAttribute(
+        "fill",
+        node.color
+    );
+
+
+    circle.setAttribute(
+        "stroke",
+        "#ffffff"
+    );
+
+
+    circle.setAttribute(
+        "stroke-width",
+        "1"
+    );
+
+
+    group.appendChild(circle);
+
+
+    const label =
+        document.createElementNS(
+            NS,
+            "text"
+        );
+
+
+    label.setAttribute(
+        "x",
+        node.x + 10
+    );
+
+
+    label.setAttribute(
+        "y",
+        node.y + 3
+    );
+
+
+    label.classList.add(
+        "node-label"
+    );
+
+
+    label.textContent =
+        node.label;
+
+
+    group.appendChild(label);
+
+
+    group.addEventListener(
+        "click",
+        function(event) {
+
+            event.stopPropagation();
+
+            selectNode(node.id);
+
+        }
+    );
+
+
+    svg.appendChild(group);
+
+});
+
+
+// ============================================================
+// NODE SELECTION
+// ============================================================
+
+function selectNode(nodeId) {
+
+    const node =
+        nodeMap[nodeId];
+
+
+    if (!node) {
+        return;
+    }
+
+
+    // Remove previous selection
+
+    document
+        .querySelectorAll(".selected")
+        .forEach(element => {
+
+            element.classList.remove(
+                "selected"
+            );
+
+        });
+
+
+    // Find selected node
+
+    const circles =
+        document.querySelectorAll(
+            ".node circle"
+        );
+
+
+    circles.forEach(circle => {
+
+        const cx =
+            parseFloat(
+                circle.getAttribute("cx")
+            );
+
+        const cy =
+            parseFloat(
+                circle.getAttribute("cy")
+            );
+
+
+        if (
+            Math.abs(cx - node.x) < 0.1 &&
+            Math.abs(cy - node.y) < 0.1
+        ) {
+
+            circle.classList.add(
+                "selected"
+            );
+
+        }
+
+    });
+
+
+    showNodeInformation(node);
+
+}
+
+
+// ============================================================
+// SHOW INFORMATION
+// ============================================================
+
+function showNodeInformation(node) {
+
+    const panel =
+        document.getElementById(
+            "nodeInfo"
+        );
+
+
+    let html = "";
+
+
+    html +=
+        '<div class="info-box">';
+
+
+    html +=
+        '<div class="info-row">' +
+        '<span class="info-key">' +
+        'Node ID: ' +
+        '</span>' +
+        node.id +
+        '</div>';
+
+
+    html +=
+        '<div class="info-row">' +
+        '<span class="info-key">' +
+        'Type: ' +
+        '</span>' +
+        node.type +
+        '</div>';
+
+
+    for (
+        const [key, value]
+        of Object.entries(
+            node.information
+        )
+    ) {
+
+        if (
+            key === "id" ||
+            key === "type"
+        ) {
+            continue;
+        }
+
+
+        html +=
+            '<div class="info-row">' +
+            '<span class="info-key">' +
+            escapeHtml(key) +
+            ': ' +
+            '</span>' +
+            escapeHtml(value) +
+            '</div>';
+
+    }
+
+
+    html +=
+        '</div>';
+
+
+    // Relationships
+
+    const relationships =
+        edges.filter(edge =>
+            edge.source === node.id ||
+            edge.target === node.id
+        );
+
+
+    html +=
+        '<h3>Relationships</h3>';
+
+
+    if (relationships.length === 0) {
+
+        html +=
+            '<p>No relationships found.</p>';
+
+    } else {
+
+        relationships
+            .slice(0, 50)
+            .forEach(edge => {
+
+                const other =
+                    edge.source === node.id
+                        ? edge.target
+                        : edge.source;
+
+
+                html +=
+                    '<div class="info-box">' +
+
+                    '<div class="info-row">' +
+
+                    '<span class="info-key">' +
+                    'Connected To: ' +
+                    '</span>' +
+
+                    escapeHtml(other) +
+
+                    '</div>' +
+
+                    '<div class="info-row">' +
+
+                    '<span class="info-key">' +
+                    'Relationship: ' +
+                    '</span>' +
+
+                    escapeHtml(
+                        edge.relationship
+                    ) +
+
+                    '</div>' +
+
+                    '</div>';
+
+            });
+
+    }
+
+
+    panel.innerHTML = html;
+
+}
+
+
+// ============================================================
+// CLEAR SELECTION
+// ============================================================
+
+function clearSelection() {
+
+    document
+        .querySelectorAll(".selected")
+        .forEach(element => {
+
+            element.classList.remove(
+                "selected"
+            );
+
+        });
+
+
+    document.getElementById(
+        "nodeInfo"
+    ).innerHTML =
+        "Click a node to see information.";
+
+}
+
+
+// ============================================================
+// HTML ESCAPE
+// ============================================================
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ============================================================
+// CLICK EMPTY AREA
+// ============================================================
+
+svg.addEventListener(
+    "click",
+    function() {
+
+        clearSelection();
+
+    }
+);
+
+
+</script>
+
+
+</body>
+
+</html>

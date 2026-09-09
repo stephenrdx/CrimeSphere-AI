@@ -1,0 +1,1732 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d0" for="edge" attr.name="relationship" attr.type="string" />
+  <graph edgedefault="undirected">
+    <node id="P005" />
+    <node id="C083" />
+    <node id="P139" />
+    <node id="C091" />
+    <node id="P130" />
+    <node id="C089" />
+    <node id="P057" />
+    <node id="C018" />
+    <node id="P074" />
+    <node id="C058" />
+    <node id="P101" />
+    <node id="C020" />
+    <node id="P136" />
+    <node id="C005" />
+    <node id="P018" />
+    <node id="C065" />
+    <node id="P084" />
+    <node id="C034" />
+    <node id="P059" />
+    <node id="C060" />
+    <node id="P050" />
+    <node id="C082" />
+    <node id="P041" />
+    <node id="C040" />
+    <node id="P117" />
+    <node id="C045" />
+    <node id="P076" />
+    <node id="C002" />
+    <node id="P025" />
+    <node id="C021" />
+    <node id="P142" />
+    <node id="P141" />
+    <node id="C014" />
+    <node id="P108" />
+    <node id="C088" />
+    <node id="P046" />
+    <node id="C081" />
+    <node id="P145" />
+    <node id="P102" />
+    <node id="C037" />
+    <node id="P016" />
+    <node id="P045" />
+    <node id="C078" />
+    <node id="P068" />
+    <node id="C008" />
+    <node id="P007" />
+    <node id="C053" />
+    <node id="P033" />
+    <node id="C011" />
+    <node id="P134" />
+    <node id="C032" />
+    <node id="P023" />
+    <node id="C059" />
+    <node id="C012" />
+    <node id="P146" />
+    <node id="C017" />
+    <node id="P090" />
+    <node id="C009" />
+    <node id="P008" />
+    <node id="P096" />
+    <node id="C069" />
+    <node id="P110" />
+    <node id="C064" />
+    <node id="C097" />
+    <node id="P067" />
+    <node id="C099" />
+    <node id="P012" />
+    <node id="C049" />
+    <node id="C084" />
+    <node id="C057" />
+    <node id="P077" />
+    <node id="P028" />
+    <node id="C004" />
+    <node id="P086" />
+    <node id="P094" />
+    <node id="C001" />
+    <node id="P053" />
+    <node id="C093" />
+    <node id="P039" />
+    <node id="C063" />
+    <node id="C031" />
+    <node id="P022" />
+    <node id="C054" />
+    <node id="P137" />
+    <node id="P082" />
+    <node id="C096" />
+    <node id="P047" />
+    <node id="C086" />
+    <node id="P001" />
+    <node id="C051" />
+    <node id="P103" />
+    <node id="P071" />
+    <node id="P114" />
+    <node id="C080" />
+    <node id="C070" />
+    <node id="C035" />
+    <node id="P021" />
+    <node id="C075" />
+    <node id="P004" />
+    <node id="C047" />
+    <node id="P129" />
+    <node id="C039" />
+    <node id="P078" />
+    <node id="C062" />
+    <node id="P061" />
+    <node id="P054" />
+    <node id="P079" />
+    <node id="C007" />
+    <node id="P097" />
+    <node id="C095" />
+    <node id="P029" />
+    <node id="P087" />
+    <node id="P092" />
+    <node id="C033" />
+    <node id="P066" />
+    <node id="C046" />
+    <node id="C023" />
+    <node id="C085" />
+    <node id="P127" />
+    <node id="C013" />
+    <node id="P038" />
+    <node id="C068" />
+    <node id="C030" />
+    <node id="C044" />
+    <node id="P133" />
+    <node id="C076" />
+    <node id="P104" />
+    <node id="C003" />
+    <node id="P026" />
+    <node id="P024" />
+    <node id="C024" />
+    <node id="P080" />
+    <node id="C048" />
+    <node id="P072" />
+    <node id="P048" />
+    <node id="P031" />
+    <node id="P062" />
+    <node id="C019" />
+    <node id="P014" />
+    <node id="C050" />
+    <node id="P042" />
+    <node id="C026" />
+    <node id="P052" />
+    <node id="C090" />
+    <node id="P115" />
+    <node id="C077" />
+    <node id="P013" />
+    <node id="P030" />
+    <node id="C061" />
+    <node id="P128" />
+    <node id="P120" />
+    <node id="P100" />
+    <node id="P091" />
+    <node id="C098" />
+    <node id="P073" />
+    <node id="P085" />
+    <node id="P113" />
+    <node id="C027" />
+    <node id="C029" />
+    <node id="C022" />
+    <node id="P043" />
+    <node id="P015" />
+    <node id="P132" />
+    <node id="C071" />
+    <node id="P121" />
+    <node id="C100" />
+    <node id="P099" />
+    <node id="P126" />
+    <node id="P051" />
+    <node id="P002" />
+    <node id="C087" />
+    <node id="P035" />
+    <node id="C025" />
+    <node id="C016" />
+    <node id="P098" />
+    <node id="P112" />
+    <node id="C074" />
+    <node id="P083" />
+    <node id="C010" />
+    <node id="P056" />
+    <node id="P055" />
+    <node id="P138" />
+    <node id="P036" />
+    <node id="P075" />
+    <node id="P109" />
+    <node id="P095" />
+    <node id="P122" />
+    <node id="P063" />
+    <node id="C092" />
+    <node id="P040" />
+    <node id="P150" />
+    <node id="C042" />
+    <node id="P020" />
+    <node id="P060" />
+    <node id="C094" />
+    <node id="C056" />
+    <node id="P119" />
+    <node id="C055" />
+    <node id="P010" />
+    <node id="P118" />
+    <node id="P093" />
+    <node id="P124" />
+    <node id="P125" />
+    <node id="P019" />
+    <node id="C038" />
+    <node id="C052" />
+    <node id="P143" />
+    <node id="P003" />
+    <node id="P123" />
+    <node id="P107" />
+    <node id="P111" />
+    <node id="C067" />
+    <node id="P089" />
+    <node id="P135" />
+    <node id="P148" />
+    <node id="P116" />
+    <node id="P034" />
+    <node id="P140" />
+    <node id="C079" />
+    <node id="C015" />
+    <node id="P149" />
+    <node id="P106" />
+    <node id="P011" />
+    <node id="C036" />
+    <node id="C072" />
+    <node id="P147" />
+    <node id="P027" />
+    <node id="P009" />
+    <node id="P064" />
+    <node id="C006" />
+    <node id="P058" />
+    <node id="C073" />
+    <node id="P070" />
+    <node id="P081" />
+    <node id="P037" />
+    <node id="P017" />
+    <node id="P069" />
+    <node id="C041" />
+    <node id="P049" />
+    <node id="P065" />
+    <node id="P044" />
+    <node id="C043" />
+    <node id="P131" />
+    <node id="P105" />
+    <node id="C028" />
+    <node id="P088" />
+    <node id="C066" />
+    <edge source="P005" target="C083">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P005" target="C023">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P005" target="C034">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P005" target="C060">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P005" target="C078">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C083" target="P023">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C083" target="P073">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C083" target="P059">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C083" target="P038">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C083" target="P078">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C083" target="P004">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C083" target="P011">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P139" target="C091">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P139" target="C024">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P139" target="C034">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P139" target="C039">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P139" target="C025">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C091" target="P053">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C091" target="P087">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C091" target="P028">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C091" target="P123">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P130" target="C089">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C089" target="P031">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C089" target="P065">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C089" target="P012">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C089" target="P054">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P057" target="C018">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P057" target="C009">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P057" target="C014">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P057" target="C050">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P057" target="C074">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P057" target="C072">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P057" target="C075">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C018" target="P142">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C018" target="P120">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C018" target="P060">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C018" target="P003">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C018" target="P105">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P074" target="C058">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P074" target="C044">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P074" target="C015">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C058" target="P001">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C058" target="P108">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C058" target="P015">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C058" target="P011">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C058" target="P020">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P101" target="C020">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P101" target="C016">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P101" target="C099">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P101" target="C017">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P101" target="C012">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C020" target="P029">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C020" target="P076">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C020" target="P024">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P136" target="C005">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P136" target="C096">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P136" target="C003">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C005" target="P016">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C005" target="P004">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C005" target="P099">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C005" target="P150">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P018" target="C065">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P018" target="C055">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P018" target="C071">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C065" target="P046">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C065" target="P150">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C065" target="P026">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C065" target="P084">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C065" target="P119">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C065" target="P142">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C065" target="P100">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C065" target="P087">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P084" target="C034">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P084" target="C097">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C034" target="P026">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C034" target="P124">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C034" target="P016">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P059" target="C060">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P059" target="C044">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P059" target="C040">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P059" target="C099">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P059" target="C046">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P059" target="C042">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C060" target="P021">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C060" target="P029">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C060" target="P042">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C060" target="P095">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C060" target="P036">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C060" target="P033">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C060" target="P125">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C060" target="P034">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P050" target="C082">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P050" target="C056">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C082" target="P077">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P041" target="C040">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P041" target="C033">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P041" target="C090">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P041" target="C023">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C040" target="P141">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C040" target="P096">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C040" target="P069">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C040" target="P126">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C040" target="P086">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P117" target="C045">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P117" target="C046">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P117" target="C029">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C045" target="P145">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C045" target="P103">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C045" target="P141">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C045" target="P071">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P076" target="C002">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P076" target="C035">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P076" target="C008">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P076" target="C021">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P076" target="C046">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C002" target="P054">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C002" target="P031">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C002" target="P056">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C002" target="P078">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C002" target="P027">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C002" target="P028">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C002" target="P004">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C002" target="P067">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P025" target="C021">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P025" target="C046">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P025" target="C095">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C021" target="P082">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C021" target="P145">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C021" target="P147">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C021" target="P149">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C021" target="P017">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C021" target="P137">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C021" target="P077">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P142" target="C032">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P142" target="C023">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P141" target="C014">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P141" target="C070">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P141" target="C037">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P141" target="C087">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P141" target="C098">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P141" target="C027">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P141" target="C066">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C014" target="P128">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C014" target="P110">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C014" target="P002">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C014" target="P028">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C014" target="P109">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P108" target="C088">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P108" target="C057">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P108" target="C051">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P108" target="C076">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P108" target="C064">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P108" target="C092">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P108" target="C001">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C088" target="P135">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C088" target="P003">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P046" target="C081">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P046" target="C084">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P046" target="C008">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P046" target="C080">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C081" target="P100">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C081" target="P103">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C081" target="P083">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P145" target="C048">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P145" target="C029">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P145" target="C099">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P145" target="C080">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P102" target="C037">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P102" target="C095">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C037" target="P055">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C037" target="P085">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C037" target="P054">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P016" target="C075">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P016" target="C086">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P045" target="C078">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P045" target="C012">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P045" target="C048">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P045" target="C052">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C078" target="P107">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C078" target="P075">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P068" target="C008">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P068" target="C001">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P068" target="C067">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C008" target="P129">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C008" target="P086">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C008" target="P109">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C008" target="P033">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C008" target="P030">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C008" target="P049">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C008" target="P122">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C008" target="P039">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P007" target="C053">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P007" target="C069">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P007" target="C090">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C053" target="P137">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C053" target="P028">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P033" target="C011">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P033" target="C096">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P033" target="C046">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P033" target="C029">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P033" target="C016">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C011" target="P103">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C011" target="P150">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P134" target="C032">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P134" target="C067">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C032" target="P001">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C032" target="P092">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P023" target="C059">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P023" target="C036">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P023" target="C012">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P023" target="C003">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C059" target="P047">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C059" target="P043">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C012" target="P086">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C012" target="P087">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C012" target="P071">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C012" target="P083">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C012" target="P001">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P146" target="C017">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P146" target="C072">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C017" target="P008">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C017" target="P071">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C017" target="P061">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C017" target="P052">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C017" target="P047">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P090" target="C009">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P090" target="C031">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C009" target="P112">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C009" target="P114">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C009" target="P123">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P008" target="C086">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P008" target="C010">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P008" target="C024">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P096" target="C069">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P096" target="C080">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P096" target="C067">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C069" target="P051">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C069" target="P020">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P110" target="C064">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P110" target="C054">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P110" target="C087">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C064" target="P085">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C064" target="P103">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C064" target="P011">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C064" target="P098">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C097" target="P014">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C097" target="P070">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C097" target="P044">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C097" target="P009">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C097" target="P060">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P067" target="C099">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P067" target="C047">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P067" target="C068">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C099" target="P040">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C099" target="P038">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P012" target="C049">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P012" target="C054">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P012" target="C047">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P012" target="C030">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P012" target="C039">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P012" target="C022">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P012" target="C080">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C049" target="P122">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C084" target="P066">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C084" target="P097">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C084" target="P013">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C084" target="P085">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C084" target="P004">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C057" target="P111">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C057" target="P086">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C057" target="P125">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P077" target="C100">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P077" target="C022">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P077" target="C023">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P077" target="C085">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P028" target="C004">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C004" target="P031">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C004" target="P118">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C004" target="P019">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P086" target="C023">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P086" target="C055">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P094" target="C001">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P094" target="C074">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C001" target="P062">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C001" target="P089">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C001" target="P147">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P053" target="C093">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P053" target="C094">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P053" target="C073">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C093" target="P048">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C093" target="P036">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P039" target="C063">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P039" target="C041">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C031" target="P013">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C031" target="P083">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P022" target="C054">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P022" target="C096">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C054" target="P066">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P082" target="C016">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P082" target="C100">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C096" target="P001">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C096" target="P106">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C096" target="P147">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P047" target="C086">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P047" target="C050">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P047" target="C015">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P047" target="C023">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C086" target="P098">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C086" target="P085">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C086" target="P075">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C051" target="P048">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C051" target="P121">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C051" target="P085">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C051" target="P042">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C051" target="P081">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C051" target="P124">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C051" target="P097">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P103" target="C030">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P103" target="C042">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P071" target="C085">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P071" target="C055">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P114" target="C080">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P114" target="C070">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P114" target="C068">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P114" target="C050">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P114" target="C022">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C080" target="P138">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C080" target="P009">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C080" target="P015">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C070" target="P075">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C070" target="P020">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C070" target="P112">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C070" target="P061">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C070" target="P116">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C035" target="P054">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C035" target="P048">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C035" target="P127">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C075" target="P027">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P004" target="C047">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P004" target="C010">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P004" target="C071">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C047" target="P106">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C047" target="P079">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C047" target="P123">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P129" target="C039">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P129" target="C043">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C039" target="P038">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C039" target="P036">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P078" target="C062">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C062" target="P126">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C062" target="P069">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P061" target="C100">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P054" target="C026">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P079" target="C007">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P079" target="C030">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C007" target="P080">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C007" target="P042">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C007" target="P149">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P097" target="C095">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P097" target="C036">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C095" target="P030">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C095" target="P109">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C095" target="P135">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C095" target="P131">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P029" target="C042">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P029" target="C029">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P029" target="C052">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P029" target="C087">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P087" target="C029">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P087" target="C077">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P092" target="C033">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C033" target="P003">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C033" target="P115">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P066" target="C046">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C046" target="P120">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C046" target="P003">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C023" target="P002">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C023" target="P052">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C023" target="P119">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C085" target="P072">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C085" target="P150">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C085" target="P100">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P127" target="C013">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C013" target="P026">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C013" target="P095">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C013" target="P125">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C013" target="P124">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C013" target="P070">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P038" target="C068">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P038" target="C052">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P038" target="C055">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C068" target="P133">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C068" target="P085">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C068" target="P111">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C044" target="P026">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C044" target="P120">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P133" target="C026">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C076" target="P013">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C076" target="P120">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C076" target="P060">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C076" target="P143">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P104" target="C003">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P104" target="C071">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P104" target="C029">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C003" target="P031">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C003" target="P048">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P026" target="C019">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P026" target="C092">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P024" target="C024">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P024" target="C055">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P024" target="C092">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C024" target="P143">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C024" target="P123">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C024" target="P020">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C024" target="P091">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P080" target="C048">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C048" target="P052">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C048" target="P058">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P048" target="C027">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P031" target="C022">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P031" target="C055">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C019" target="P010">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C019" target="P123">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P014" target="C050">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P014" target="C061">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C050" target="P027">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P042" target="C026">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P042" target="C022">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C026" target="P148">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C026" target="P106">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P052" target="C090">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C090" target="P075">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P115" target="C077">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C077" target="P116">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C077" target="P035">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C077" target="P003">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P013" target="C010">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P030" target="C061">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C061" target="P043">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C061" target="P107">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P128" target="C010">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P120" target="C036">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P091" target="C098">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="C098" target="P015">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C098" target="P099">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C098" target="P003">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C098" target="P036">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P113" target="C027">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C027" target="P150">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C027" target="P126">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C029" target="P098">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C029" target="P069">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C022" target="P143">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P015" target="C036">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P132" target="C071">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C071" target="P060">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P121" target="C100">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C100" target="P069">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C100" target="P083">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P099" target="C094">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P051" target="C015">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P002" target="C010">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P002" target="C072">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P035" target="C025">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C025" target="P083">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C025" target="P064">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C025" target="P063">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C025" target="P065">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C016" target="P093">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C016" target="P037">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C074" target="P036">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C010" target="P124">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P138" target="C073">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="P036" target="C041">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P095" target="C056">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P063" target="C092">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C092" target="P060">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P040" target="C006">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P150" target="C038">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C042" target="P088">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C094" target="P058">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C094" target="P069">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P119" target="C055">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="C055" target="P149">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="C055" target="P034">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P118" target="C028">
+      <data key="d0">Suspect</data>
+    </edge>
+    <edge source="P019" target="C038">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="C052" target="P034">
+      <data key="d0">Associate</data>
+    </edge>
+    <edge source="P003" target="C015">
+      <data key="d0">Person Mentioned</data>
+    </edge>
+    <edge source="P135" target="C028">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P140" target="C079">
+      <data key="d0">Victim</data>
+    </edge>
+    <edge source="P147" target="C073">
+      <data key="d0">Witness</data>
+    </edge>
+    <edge source="C006" target="P044">
+      <data key="d0">Victim</data>
+    </edge>
+  </graph>
+</graphml>

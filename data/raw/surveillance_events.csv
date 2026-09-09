@@ -1,0 +1,501 @@
+surveillance_id,person_id,location_id,observation,observation_date
+S001,P044,L022,Unknown activity,2026-05-04
+S002,P016,L002,Person leaving location,2026-08-02
+S003,P102,L018,Person leaving location,2026-03-28
+S004,P042,L027,Person leaving location,2026-03-27
+S005,P112,L030,Vehicle observed,2026-01-25
+S006,P059,L006,Unknown activity,2026-05-07
+S007,P053,L029,Unknown activity,2026-05-08
+S008,P099,L022,Vehicle observed,2026-01-31
+S009,P055,L027,Person leaving location,2026-03-22
+S010,P105,L029,Meeting observed,2025-10-13
+S011,P130,L011,Meeting observed,2026-02-06
+S012,P139,L030,Person leaving location,2026-02-17
+S013,P046,L013,Person leaving location,2026-07-19
+S014,P027,L008,Person leaving location,2026-08-16
+S015,P142,L010,Meeting observed,2025-10-11
+S016,P001,L003,Vehicle observed,2025-11-28
+S017,P040,L022,Unknown activity,2025-11-10
+S018,P041,L007,Vehicle observed,2026-05-24
+S019,P040,L004,Unknown activity,2026-06-11
+S020,P131,L024,Vehicle observed,2025-11-15
+S021,P090,L029,Vehicle observed,2026-01-11
+S022,P119,L024,Unknown activity,2025-11-15
+S023,P017,L017,Person leaving location,2026-08-06
+S024,P084,L023,Meeting observed,2025-10-26
+S025,P104,L029,Person leaving location,2026-07-08
+S026,P127,L013,Meeting observed,2026-08-12
+S027,P012,L014,Person entering location,2026-07-26
+S028,P149,L006,Meeting observed,2026-06-21
+S029,P138,L017,Meeting observed,2026-02-27
+S030,P069,L008,Meeting observed,2026-08-25
+S031,P033,L015,Unknown activity,2026-02-03
+S032,P114,L014,Meeting observed,2026-01-31
+S033,P118,L030,Unknown activity,2025-10-05
+S034,P029,L012,Unknown activity,2026-08-26
+S035,P108,L019,Unknown activity,2026-03-31
+S036,P064,L018,Person entering location,2026-06-17
+S037,P090,L022,Person leaving location,2025-09-18
+S038,P046,L024,Meeting observed,2026-06-14
+S039,P039,L023,Person leaving location,2026-03-16
+S040,P097,L012,Person leaving location,2026-01-31
+S041,P137,L013,Vehicle observed,2026-07-29
+S042,P091,L019,Meeting observed,2025-09-21
+S043,P036,L011,Person leaving location,2026-01-28
+S044,P053,L010,Unknown activity,2026-04-07
+S045,P130,L019,Unknown activity,2026-01-04
+S046,P042,L011,Person entering location,2025-10-27
+S047,P058,L020,Person entering location,2025-10-11
+S048,P112,L021,Meeting observed,2025-12-10
+S049,P114,L024,Person entering location,2026-09-02
+S050,P035,L019,Unknown activity,2026-04-15
+S051,P006,L015,Person entering location,2026-02-07
+S052,P122,L005,Unknown activity,2026-02-04
+S053,P106,L014,Unknown activity,2025-11-13
+S054,P078,L003,Person leaving location,2026-04-15
+S055,P147,L020,Person leaving location,2025-09-18
+S056,P125,L001,Unknown activity,2025-12-19
+S057,P001,L018,Unknown activity,2026-08-28
+S058,P118,L010,Person leaving location,2025-11-29
+S059,P066,L018,Person entering location,2026-02-17
+S060,P147,L010,Person leaving location,2026-08-25
+S061,P071,L003,Unknown activity,2026-03-25
+S062,P050,L026,Unknown activity,2025-12-19
+S063,P130,L028,Person entering location,2026-08-27
+S064,P029,L014,Person leaving location,2026-09-01
+S065,P063,L010,Person leaving location,2026-01-06
+S066,P133,L021,Person entering location,2026-08-06
+S067,P053,L013,Unknown activity,2026-02-01
+S068,P138,L026,Unknown activity,2026-02-05
+S069,P028,L013,Person entering location,2025-09-14
+S070,P150,L018,Meeting observed,2026-06-15
+S071,P068,L010,Person entering location,2026-06-28
+S072,P003,L026,Unknown activity,2026-03-17
+S073,P043,L022,Unknown activity,2026-03-01
+S074,P101,L029,Meeting observed,2026-05-05
+S075,P084,L006,Meeting observed,2026-03-17
+S076,P009,L006,Person leaving location,2026-01-21
+S077,P036,L015,Meeting observed,2026-05-15
+S078,P102,L013,Person entering location,2026-07-16
+S079,P142,L020,Meeting observed,2026-05-22
+S080,P005,L027,Unknown activity,2025-12-15
+S081,P046,L009,Unknown activity,2026-04-11
+S082,P065,L012,Unknown activity,2026-03-20
+S083,P027,L025,Vehicle observed,2025-10-17
+S084,P001,L018,Unknown activity,2026-04-02
+S085,P147,L018,Vehicle observed,2026-02-19
+S086,P011,L011,Person leaving location,2026-01-31
+S087,P079,L022,Unknown activity,2026-07-30
+S088,P142,L008,Unknown activity,2026-05-02
+S089,P122,L009,Meeting observed,2026-08-30
+S090,P142,L012,Person leaving location,2026-07-03
+S091,P061,L001,Vehicle observed,2026-07-05
+S092,P115,L026,Person entering location,2026-06-06
+S093,P004,L002,Meeting observed,2026-02-28
+S094,P055,L002,Person entering location,2026-02-05
+S095,P100,L025,Person leaving location,2026-05-23
+S096,P027,L019,Unknown activity,2025-12-02
+S097,P092,L021,Vehicle observed,2025-09-24
+S098,P005,L030,Person entering location,2025-11-30
+S099,P100,L010,Meeting observed,2026-06-13
+S100,P143,L009,Unknown activity,2026-09-02
+S101,P050,L027,Person leaving location,2026-04-20
+S102,P139,L022,Person entering location,2026-02-24
+S103,P111,L015,Unknown activity,2026-08-22
+S104,P014,L017,Person leaving location,2026-06-19
+S105,P005,L021,Meeting observed,2026-01-03
+S106,P136,L016,Vehicle observed,2025-10-02
+S107,P107,L029,Meeting observed,2026-08-04
+S108,P008,L004,Vehicle observed,2025-11-01
+S109,P110,L012,Meeting observed,2026-04-05
+S110,P013,L008,Person entering location,2026-03-25
+S111,P076,L010,Person entering location,2026-02-10
+S112,P034,L020,Unknown activity,2026-05-01
+S113,P012,L013,Person leaving location,2025-11-03
+S114,P071,L022,Person entering location,2025-09-10
+S115,P109,L018,Person leaving location,2026-01-13
+S116,P096,L006,Person entering location,2026-08-17
+S117,P010,L013,Vehicle observed,2025-12-21
+S118,P033,L004,Person entering location,2026-06-14
+S119,P089,L020,Unknown activity,2025-10-01
+S120,P112,L028,Person leaving location,2025-10-03
+S121,P036,L011,Person leaving location,2026-05-20
+S122,P046,L006,Vehicle observed,2026-06-27
+S123,P032,L020,Meeting observed,2025-09-13
+S124,P085,L008,Vehicle observed,2026-08-20
+S125,P076,L015,Meeting observed,2025-10-18
+S126,P067,L016,Person entering location,2025-09-05
+S127,P123,L029,Person leaving location,2025-10-03
+S128,P078,L018,Person entering location,2026-03-08
+S129,P084,L012,Unknown activity,2025-10-30
+S130,P058,L020,Person leaving location,2026-06-09
+S131,P084,L006,Meeting observed,2025-09-21
+S132,P060,L018,Vehicle observed,2026-05-16
+S133,P081,L001,Person leaving location,2026-02-06
+S134,P021,L005,Person entering location,2025-09-18
+S135,P086,L024,Person entering location,2026-07-30
+S136,P056,L004,Vehicle observed,2025-11-20
+S137,P015,L001,Vehicle observed,2026-01-22
+S138,P101,L005,Vehicle observed,2026-05-10
+S139,P024,L030,Meeting observed,2025-09-17
+S140,P121,L008,Vehicle observed,2026-05-16
+S141,P119,L016,Vehicle observed,2026-03-08
+S142,P109,L025,Person entering location,2026-01-29
+S143,P138,L021,Unknown activity,2026-01-05
+S144,P064,L020,Person entering location,2025-10-22
+S145,P143,L011,Person entering location,2025-09-08
+S146,P142,L011,Vehicle observed,2026-05-29
+S147,P047,L019,Person entering location,2025-11-17
+S148,P044,L022,Person entering location,2026-07-10
+S149,P036,L023,Person entering location,2026-02-14
+S150,P026,L013,Meeting observed,2026-08-16
+S151,P129,L011,Person leaving location,2026-02-10
+S152,P095,L020,Meeting observed,2026-04-20
+S153,P115,L003,Meeting observed,2026-01-04
+S154,P087,L030,Meeting observed,2025-12-16
+S155,P136,L028,Meeting observed,2026-02-20
+S156,P093,L010,Unknown activity,2025-09-10
+S157,P024,L009,Person leaving location,2026-06-15
+S158,P117,L010,Person entering location,2026-01-23
+S159,P121,L008,Person entering location,2026-06-29
+S160,P055,L012,Vehicle observed,2025-12-26
+S161,P077,L015,Unknown activity,2026-07-07
+S162,P076,L004,Person leaving location,2026-07-24
+S163,P031,L012,Unknown activity,2026-07-15
+S164,P077,L023,Unknown activity,2025-09-18
+S165,P118,L007,Person entering location,2026-06-11
+S166,P075,L028,Unknown activity,2026-03-31
+S167,P053,L002,Person entering location,2025-11-13
+S168,P060,L016,Unknown activity,2025-12-16
+S169,P137,L001,Vehicle observed,2025-09-24
+S170,P050,L004,Unknown activity,2026-02-16
+S171,P056,L014,Meeting observed,2025-12-15
+S172,P018,L023,Vehicle observed,2026-07-16
+S173,P062,L027,Unknown activity,2025-12-08
+S174,P047,L014,Meeting observed,2026-02-14
+S175,P132,L016,Unknown activity,2026-06-06
+S176,P137,L029,Vehicle observed,2026-05-07
+S177,P143,L003,Person entering location,2026-07-11
+S178,P045,L016,Unknown activity,2026-02-27
+S179,P122,L007,Meeting observed,2025-11-09
+S180,P074,L027,Unknown activity,2025-10-08
+S181,P112,L006,Person entering location,2026-08-30
+S182,P017,L011,Vehicle observed,2026-04-13
+S183,P032,L015,Person entering location,2026-05-21
+S184,P105,L011,Vehicle observed,2026-07-06
+S185,P084,L024,Vehicle observed,2026-03-18
+S186,P124,L026,Unknown activity,2026-03-24
+S187,P013,L004,Unknown activity,2026-03-01
+S188,P145,L028,Meeting observed,2026-07-21
+S189,P092,L014,Person leaving location,2026-04-28
+S190,P049,L010,Person entering location,2026-08-14
+S191,P098,L016,Meeting observed,2025-12-20
+S192,P123,L015,Person leaving location,2026-05-04
+S193,P042,L019,Person leaving location,2026-01-03
+S194,P017,L010,Vehicle observed,2026-07-23
+S195,P054,L027,Person leaving location,2026-04-18
+S196,P035,L019,Unknown activity,2025-12-21
+S197,P148,L009,Person leaving location,2025-11-04
+S198,P111,L009,Person entering location,2026-08-23
+S199,P014,L020,Unknown activity,2026-07-29
+S200,P148,L019,Meeting observed,2025-12-29
+S201,P010,L004,Meeting observed,2026-04-05
+S202,P137,L020,Unknown activity,2026-06-12
+S203,P088,L016,Vehicle observed,2026-02-19
+S204,P148,L001,Unknown activity,2026-02-01
+S205,P060,L027,Person entering location,2026-02-16
+S206,P042,L004,Meeting observed,2025-10-07
+S207,P139,L020,Person leaving location,2026-06-13
+S208,P134,L010,Person entering location,2026-06-26
+S209,P044,L021,Person entering location,2026-07-26
+S210,P100,L009,Unknown activity,2026-02-27
+S211,P133,L010,Unknown activity,2026-01-30
+S212,P118,L019,Person entering location,2026-05-28
+S213,P113,L006,Unknown activity,2025-11-02
+S214,P095,L027,Person leaving location,2025-10-25
+S215,P085,L021,Unknown activity,2026-07-30
+S216,P090,L025,Unknown activity,2026-05-08
+S217,P033,L017,Meeting observed,2026-02-11
+S218,P014,L006,Vehicle observed,2025-12-18
+S219,P019,L015,Unknown activity,2026-06-30
+S220,P119,L024,Unknown activity,2026-06-26
+S221,P019,L027,Vehicle observed,2026-01-10
+S222,P077,L017,Unknown activity,2026-01-24
+S223,P049,L021,Unknown activity,2025-12-05
+S224,P116,L029,Meeting observed,2026-06-28
+S225,P119,L001,Person entering location,2026-01-25
+S226,P149,L017,Person entering location,2025-10-08
+S227,P068,L030,Person entering location,2026-08-03
+S228,P026,L026,Person entering location,2026-06-01
+S229,P053,L014,Person leaving location,2025-11-03
+S230,P041,L017,Person leaving location,2026-05-31
+S231,P134,L004,Meeting observed,2025-12-28
+S232,P047,L024,Vehicle observed,2026-07-17
+S233,P008,L007,Unknown activity,2025-12-12
+S234,P129,L011,Person leaving location,2026-06-20
+S235,P138,L004,Meeting observed,2025-11-01
+S236,P148,L008,Unknown activity,2026-02-05
+S237,P126,L027,Unknown activity,2026-01-14
+S238,P021,L009,Person entering location,2026-06-25
+S239,P148,L001,Meeting observed,2025-10-10
+S240,P147,L021,Vehicle observed,2026-05-12
+S241,P027,L015,Person leaving location,2025-11-11
+S242,P148,L002,Person entering location,2026-08-26
+S243,P081,L005,Unknown activity,2025-11-19
+S244,P109,L030,Person leaving location,2026-04-12
+S245,P150,L007,Vehicle observed,2025-09-30
+S246,P096,L003,Person entering location,2026-03-28
+S247,P130,L018,Meeting observed,2026-07-29
+S248,P119,L024,Meeting observed,2025-09-16
+S249,P082,L007,Vehicle observed,2026-03-24
+S250,P102,L001,Meeting observed,2025-11-08
+S251,P032,L019,Vehicle observed,2025-09-16
+S252,P150,L003,Meeting observed,2026-06-05
+S253,P064,L028,Unknown activity,2026-07-24
+S254,P033,L028,Unknown activity,2026-07-20
+S255,P122,L010,Vehicle observed,2026-06-06
+S256,P081,L012,Meeting observed,2025-12-03
+S257,P063,L024,Person leaving location,2026-06-04
+S258,P011,L019,Meeting observed,2025-10-12
+S259,P136,L011,Unknown activity,2025-11-19
+S260,P026,L028,Unknown activity,2026-07-25
+S261,P032,L002,Person entering location,2025-09-05
+S262,P084,L002,Vehicle observed,2026-08-03
+S263,P077,L007,Person leaving location,2025-12-01
+S264,P053,L013,Meeting observed,2026-07-17
+S265,P088,L030,Unknown activity,2025-11-01
+S266,P128,L007,Person leaving location,2025-10-02
+S267,P103,L005,Person leaving location,2026-07-03
+S268,P021,L007,Person entering location,2026-08-06
+S269,P131,L024,Unknown activity,2026-08-19
+S270,P103,L019,Vehicle observed,2026-02-02
+S271,P054,L012,Vehicle observed,2026-03-22
+S272,P016,L023,Meeting observed,2025-12-27
+S273,P086,L018,Person entering location,2026-03-23
+S274,P111,L003,Person entering location,2025-11-06
+S275,P075,L015,Vehicle observed,2025-10-16
+S276,P023,L021,Person entering location,2026-04-24
+S277,P099,L027,Person leaving location,2025-12-30
+S278,P062,L019,Person leaving location,2025-10-28
+S279,P146,L006,Person entering location,2026-07-05
+S280,P089,L026,Meeting observed,2026-03-14
+S281,P026,L013,Person entering location,2026-04-24
+S282,P064,L013,Unknown activity,2026-07-27
+S283,P011,L022,Vehicle observed,2025-10-20
+S284,P131,L030,Vehicle observed,2025-12-22
+S285,P121,L016,Vehicle observed,2026-03-22
+S286,P117,L001,Vehicle observed,2025-11-08
+S287,P140,L020,Person leaving location,2025-11-06
+S288,P097,L014,Meeting observed,2025-11-29
+S289,P088,L030,Vehicle observed,2026-07-11
+S290,P076,L006,Unknown activity,2026-04-11
+S291,P022,L013,Person entering location,2026-04-24
+S292,P066,L003,Person leaving location,2026-07-22
+S293,P020,L002,Meeting observed,2026-05-18
+S294,P119,L011,Vehicle observed,2025-10-02
+S295,P086,L018,Person entering location,2025-12-03
+S296,P105,L027,Person entering location,2026-03-16
+S297,P011,L012,Meeting observed,2025-10-13
+S298,P010,L007,Unknown activity,2026-05-06
+S299,P140,L001,Vehicle observed,2026-04-17
+S300,P126,L007,Meeting observed,2025-10-07
+S301,P068,L005,Person leaving location,2026-07-25
+S302,P108,L007,Person leaving location,2026-06-25
+S303,P035,L030,Unknown activity,2026-01-13
+S304,P027,L009,Person entering location,2025-11-07
+S305,P070,L015,Meeting observed,2026-06-11
+S306,P136,L025,Unknown activity,2026-01-11
+S307,P059,L019,Person entering location,2026-01-13
+S308,P055,L030,Meeting observed,2026-06-10
+S309,P148,L014,Unknown activity,2026-01-22
+S310,P012,L014,Person leaving location,2025-11-20
+S311,P103,L009,Unknown activity,2026-07-09
+S312,P001,L019,Vehicle observed,2026-08-22
+S313,P045,L017,Unknown activity,2026-08-26
+S314,P072,L020,Unknown activity,2025-11-13
+S315,P117,L025,Person entering location,2026-01-22
+S316,P082,L025,Person entering location,2026-06-11
+S317,P029,L028,Vehicle observed,2026-03-19
+S318,P085,L018,Person leaving location,2026-08-22
+S319,P035,L028,Person leaving location,2025-10-15
+S320,P032,L015,Person entering location,2025-11-16
+S321,P051,L001,Person leaving location,2026-07-23
+S322,P142,L018,Meeting observed,2026-03-27
+S323,P028,L025,Person leaving location,2026-07-06
+S324,P070,L025,Meeting observed,2026-03-20
+S325,P052,L010,Vehicle observed,2026-04-04
+S326,P129,L025,Unknown activity,2025-12-20
+S327,P017,L017,Person leaving location,2026-06-29
+S328,P053,L018,Person leaving location,2026-02-07
+S329,P114,L021,Person entering location,2026-01-29
+S330,P132,L008,Vehicle observed,2025-10-08
+S331,P055,L013,Person entering location,2026-03-27
+S332,P122,L015,Meeting observed,2025-12-01
+S333,P065,L004,Vehicle observed,2026-06-26
+S334,P003,L020,Meeting observed,2025-09-21
+S335,P029,L012,Vehicle observed,2026-02-03
+S336,P132,L027,Person leaving location,2026-07-04
+S337,P006,L006,Unknown activity,2026-06-27
+S338,P033,L013,Vehicle observed,2026-07-02
+S339,P090,L009,Vehicle observed,2025-11-03
+S340,P011,L030,Person entering location,2026-09-03
+S341,P018,L021,Vehicle observed,2026-03-20
+S342,P060,L029,Meeting observed,2026-03-21
+S343,P009,L024,Person entering location,2026-08-18
+S344,P116,L015,Vehicle observed,2026-05-15
+S345,P002,L009,Person entering location,2026-08-28
+S346,P017,L001,Meeting observed,2026-05-09
+S347,P127,L023,Unknown activity,2025-10-17
+S348,P070,L004,Unknown activity,2026-01-17
+S349,P056,L006,Person entering location,2026-01-21
+S350,P096,L025,Vehicle observed,2026-04-27
+S351,P142,L021,Meeting observed,2026-06-21
+S352,P016,L020,Person leaving location,2025-12-27
+S353,P080,L004,Vehicle observed,2025-09-24
+S354,P037,L025,Person entering location,2025-10-08
+S355,P140,L015,Meeting observed,2026-02-01
+S356,P143,L016,Vehicle observed,2026-07-08
+S357,P100,L009,Unknown activity,2026-08-17
+S358,P105,L007,Vehicle observed,2026-02-23
+S359,P046,L012,Meeting observed,2026-07-01
+S360,P127,L027,Person entering location,2025-09-30
+S361,P037,L006,Person entering location,2026-03-06
+S362,P004,L009,Vehicle observed,2026-04-19
+S363,P045,L014,Meeting observed,2025-10-11
+S364,P028,L018,Unknown activity,2026-06-13
+S365,P014,L002,Vehicle observed,2026-06-15
+S366,P079,L013,Unknown activity,2026-04-12
+S367,P111,L004,Person leaving location,2025-10-06
+S368,P056,L002,Person leaving location,2025-11-09
+S369,P004,L005,Unknown activity,2026-05-26
+S370,P103,L015,Vehicle observed,2026-02-27
+S371,P015,L030,Vehicle observed,2026-02-08
+S372,P009,L002,Unknown activity,2025-09-04
+S373,P086,L025,Vehicle observed,2026-06-27
+S374,P101,L029,Person leaving location,2026-05-21
+S375,P035,L003,Unknown activity,2026-05-18
+S376,P093,L007,Person leaving location,2025-09-17
+S377,P140,L019,Meeting observed,2026-03-24
+S378,P003,L011,Person leaving location,2025-12-19
+S379,P122,L020,Person entering location,2026-04-21
+S380,P008,L002,Meeting observed,2026-08-22
+S381,P127,L008,Vehicle observed,2026-01-05
+S382,P086,L026,Unknown activity,2026-04-24
+S383,P004,L001,Person leaving location,2026-02-19
+S384,P056,L020,Person leaving location,2025-12-13
+S385,P023,L007,Meeting observed,2026-03-15
+S386,P116,L006,Vehicle observed,2026-02-08
+S387,P024,L004,Vehicle observed,2025-10-24
+S388,P139,L027,Person leaving location,2026-08-28
+S389,P145,L002,Unknown activity,2026-01-23
+S390,P121,L029,Meeting observed,2026-02-04
+S391,P100,L016,Vehicle observed,2025-09-27
+S392,P048,L004,Meeting observed,2026-04-23
+S393,P065,L011,Person entering location,2026-07-16
+S394,P105,L026,Meeting observed,2025-11-26
+S395,P127,L004,Unknown activity,2026-03-23
+S396,P043,L018,Meeting observed,2026-04-18
+S397,P122,L027,Meeting observed,2026-08-05
+S398,P117,L009,Person entering location,2026-08-11
+S399,P063,L014,Meeting observed,2025-09-10
+S400,P038,L027,Vehicle observed,2025-12-24
+S401,P078,L010,Vehicle observed,2025-09-12
+S402,P048,L012,Vehicle observed,2026-05-15
+S403,P024,L021,Person leaving location,2025-09-03
+S404,P004,L005,Person entering location,2025-10-19
+S405,P047,L007,Unknown activity,2026-05-09
+S406,P070,L025,Meeting observed,2025-09-29
+S407,P037,L024,Meeting observed,2026-07-25
+S408,P150,L009,Person entering location,2026-08-05
+S409,P115,L026,Person leaving location,2026-06-28
+S410,P047,L013,Unknown activity,2025-11-05
+S411,P006,L007,Vehicle observed,2026-08-24
+S412,P108,L021,Person entering location,2026-07-03
+S413,P081,L004,Vehicle observed,2026-06-16
+S414,P034,L016,Person leaving location,2026-05-17
+S415,P021,L021,Person leaving location,2026-03-29
+S416,P077,L024,Unknown activity,2026-07-11
+S417,P007,L022,Vehicle observed,2025-09-21
+S418,P070,L012,Person entering location,2025-09-16
+S419,P150,L018,Person entering location,2026-02-02
+S420,P029,L013,Meeting observed,2026-02-13
+S421,P034,L004,Meeting observed,2026-05-02
+S422,P148,L022,Meeting observed,2026-05-26
+S423,P082,L030,Unknown activity,2026-07-03
+S424,P149,L030,Meeting observed,2026-07-23
+S425,P044,L026,Person leaving location,2026-04-04
+S426,P139,L029,Person leaving location,2026-02-10
+S427,P074,L024,Unknown activity,2026-08-02
+S428,P138,L029,Person leaving location,2026-05-04
+S429,P066,L016,Unknown activity,2026-08-27
+S430,P110,L026,Unknown activity,2026-08-14
+S431,P108,L005,Vehicle observed,2026-03-29
+S432,P119,L013,Meeting observed,2025-10-03
+S433,P003,L017,Unknown activity,2025-09-03
+S434,P069,L010,Person leaving location,2026-05-29
+S435,P067,L001,Unknown activity,2025-09-28
+S436,P060,L015,Unknown activity,2025-09-21
+S437,P023,L019,Meeting observed,2026-07-30
+S438,P147,L002,Person leaving location,2025-11-11
+S439,P075,L020,Unknown activity,2026-07-04
+S440,P034,L003,Person leaving location,2025-10-21
+S441,P077,L002,Meeting observed,2026-07-26
+S442,P104,L019,Unknown activity,2026-05-03
+S443,P052,L013,Unknown activity,2026-06-16
+S444,P033,L027,Vehicle observed,2026-07-31
+S445,P084,L008,Person entering location,2026-02-11
+S446,P139,L009,Unknown activity,2026-07-02
+S447,P112,L009,Person leaving location,2026-05-12
+S448,P011,L017,Vehicle observed,2025-09-13
+S449,P031,L008,Unknown activity,2026-06-25
+S450,P136,L014,Person entering location,2025-09-25
+S451,P071,L014,Vehicle observed,2026-01-05
+S452,P038,L023,Meeting observed,2026-05-08
+S453,P044,L003,Vehicle observed,2025-09-05
+S454,P052,L024,Person leaving location,2025-12-05
+S455,P038,L028,Meeting observed,2026-01-24
+S456,P092,L029,Person entering location,2026-03-12
+S457,P001,L029,Vehicle observed,2026-02-26
+S458,P056,L001,Meeting observed,2026-03-19
+S459,P006,L001,Unknown activity,2026-02-17
+S460,P133,L013,Vehicle observed,2026-02-25
+S461,P075,L024,Person leaving location,2026-04-06
+S462,P117,L008,Unknown activity,2026-08-31
+S463,P029,L020,Meeting observed,2026-04-03
+S464,P001,L017,Unknown activity,2026-06-20
+S465,P147,L025,Unknown activity,2026-06-12
+S466,P024,L004,Person entering location,2026-05-10
+S467,P031,L013,Meeting observed,2026-02-21
+S468,P006,L019,Meeting observed,2026-02-26
+S469,P099,L019,Vehicle observed,2026-07-16
+S470,P061,L005,Person leaving location,2026-02-12
+S471,P052,L030,Person leaving location,2026-05-12
+S472,P149,L022,Unknown activity,2026-07-22
+S473,P148,L024,Person leaving location,2026-05-21
+S474,P012,L013,Meeting observed,2025-11-10
+S475,P139,L026,Person entering location,2026-02-22
+S476,P077,L018,Meeting observed,2025-12-22
+S477,P141,L014,Person leaving location,2026-08-01
+S478,P067,L013,Vehicle observed,2026-05-06
+S479,P011,L002,Meeting observed,2026-02-14
+S480,P132,L009,Vehicle observed,2025-09-16
+S481,P064,L014,Meeting observed,2025-12-07
+S482,P025,L024,Vehicle observed,2026-06-30
+S483,P115,L003,Meeting observed,2026-07-17
+S484,P134,L029,Meeting observed,2025-10-20
+S485,P082,L003,Unknown activity,2026-07-15
+S486,P143,L021,Person entering location,2025-10-15
+S487,P067,L011,Unknown activity,2025-10-13
+S488,P037,L025,Unknown activity,2026-05-13
+S489,P080,L005,Meeting observed,2026-04-13
+S490,P049,L021,Person entering location,2026-01-30
+S491,P004,L003,Person entering location,2026-02-28
+S492,P053,L011,Vehicle observed,2026-08-25
+S493,P072,L014,Person leaving location,2026-07-03
+S494,P008,L015,Person entering location,2025-10-29
+S495,P097,L019,Unknown activity,2026-06-20
+S496,P065,L010,Unknown activity,2026-03-09
+S497,P070,L028,Person leaving location,2026-08-31
+S498,P111,L015,Vehicle observed,2026-04-28
+S499,P014,L004,Meeting observed,2026-02-15
+S500,P141,L005,Person entering location,2026-03-27
