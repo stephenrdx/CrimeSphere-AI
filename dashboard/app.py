@@ -1,9 +1,18 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import networkx as nx
 from pathlib import Path
 from itertools import combinations
 import html
+import os
+import json
+import hashlib
+import re
+from datetime import datetime
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 # ============================================================
 # CAPACITY / CRIMINAL NETWORK ANALYSIS — CRIMESPHERE UI
@@ -22,7 +31,9 @@ st.set_page_config(
 # PATHS
 # ============================================================
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+APP_DIR = Path(__file__).resolve().parent
+# Supports both the original dashboard/app.py structure and root-level app.py.
+BASE_DIR = APP_DIR.parent if (APP_DIR.parent / "data").exists() else APP_DIR
 DATA_DIR = BASE_DIR / "data" / "raw"
 PROCESSED_DIR = BASE_DIR / "data" / "processed"
 
@@ -35,7 +46,134 @@ FILES = {
     "forensic": DATA_DIR / "forensic_fingerprint_reports.csv",
     "assessment": PROCESSED_DIR / "investigative_assessment.csv",
     "graph": PROCESSED_DIR / "criminal_network.graphml",
+    # Master/entity datasets used by the Network Explorer investigation graph.
+    "persons_master": DATA_DIR / "persons.csv",
+    "phones": DATA_DIR / "phones.csv",
+    "vehicles": DATA_DIR / "vehicles.csv",
+    "vehicle_events": DATA_DIR / "vehicle_events.csv",
+    "bank_accounts": DATA_DIR / "bank_accounts.csv",
+    "devices": DATA_DIR / "devices.csv",
+    "surveillance": DATA_DIR / "surveillance_events.csv",
+    "locations_master": DATA_DIR / "locations.csv",
+    "organizations": DATA_DIR / "organizations.csv",
+    # Fingerprint image evidence registry and storage.
+    "fingerprint_registry": DATA_DIR / "fingerprint_image_registry.csv",
+    "fingerprint_images_dir": DATA_DIR / "fingerprint_images",
 }
+
+# ============================================================
+# ROLE-BASED AUTHENTICATION
+# Category A = Admin (full access)
+# Category B = Police / Investigator (operational access)
+# ============================================================
+
+USERS_FILE = PROCESSED_DIR / "user_accounts.json"
+
+ROLE_PAGES = {
+    "Admin": [label for _, items in [
+        ("MAIN", [("", "Dashboard"), ("", "Cases")]),
+        ("INTELLIGENCE", [("", "FIR Intelligence"), ("", "Historical Cases"), ("", "CDR Intelligence"), ("", "Transactions"), ("", "Surveillance")]),
+        ("ANALYSIS", [("", "Individual Investigation"), ("", "Network Explorer"), ("", "Relationships"), ("", "Timeline"), ("", "Evidence")]),
+        ("SYSTEM", [("", "Reports"), ("", "Settings")]),
+    ] for _, label in items],
+    "Police": [
+        "Dashboard", "Cases", "FIR Intelligence", "Historical Cases",
+        "CDR Intelligence", "Transactions", "Surveillance",
+        "Individual Investigation", "Network Explorer", "Relationships",
+        "Timeline", "Evidence", "Reports"
+    ],
+    "Investigator": [
+        "Dashboard", "Cases", "FIR Intelligence", "Historical Cases",
+        "CDR Intelligence", "Transactions", "Surveillance",
+        "Individual Investigation", "Network Explorer", "Relationships",
+        "Timeline", "Evidence", "Reports"
+    ],
+}
+
+ROLE_CATEGORY = {"Admin": "A", "Police": "B", "Investigator": "B"}
+ROLE_LABEL = {
+    "Admin": "Category A — Administrator",
+    "Police": "Category B — Police Officer",
+    "Investigator": "Category B — Investigator",
+}
+
+def _password_hash(password):
+    return hashlib.sha256(str(password).encode("utf-8")).hexdigest()
+
+def _default_users():
+    return {
+        "admin": {"password_hash": _password_hash("Admin@123"), "role": "Admin", "active": True},
+        "police": {"password_hash": _password_hash("Police@123"), "role": "Police", "active": True},
+        "investigator": {"password_hash": _password_hash("Investigator@123"), "role": "Investigator", "active": True},
+    }
+
+def load_users():
+    USERS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    if not USERS_FILE.exists():
+        data = _default_users()
+        USERS_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        return data
+    try:
+        data = json.loads(USERS_FILE.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) and data else _default_users()
+    except Exception:
+        return _default_users()
+
+def save_users(users):
+    USERS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    USERS_FILE.write_text(json.dumps(users, indent=2), encoding="utf-8")
+
+def _logout():
+    for key in ["authenticated", "username", "role", "category", "page", "selected_case_id", "individual_investigation_select"]:
+        st.session_state.pop(key, None)
+    st.session_state.authenticated = False
+    st.rerun()
+
+def render_login():
+    st.markdown("""
+    <style>
+    [data-testid="stAppViewContainer"] .main .block-container {
+        max-width: 560px !important; margin: 0 auto !important; padding-top: 9vh !important;
+    }
+    .login-card { background:#fff; border:1px solid #d7d2c8; border-radius:14px; padding:38px 42px; box-shadow:0 18px 50px rgba(25,35,45,.10); }
+    .login-brand { font-size:30px; font-weight:800; color:#243746; letter-spacing:-1px; }
+    .login-sub { color:#68737b; margin:4px 0 24px; font-size:13px; }
+    .login-role { display:inline-block; background:#f3f1ec; border:1px solid #d7d2c8; border-radius:999px; padding:6px 10px; font-size:11px; color:#68737b; margin-bottom:20px; }
+    .login-note { margin-top:18px; padding:12px; background:#faf9f6; border:1px solid #e7e3da; border-radius:8px; font-size:11px; color:#68737b; line-height:1.5; }
+    </style>
+    <div class="login-card">
+      <div class="login-brand">CrimeSphere AI</div>
+      <div class="login-sub">Investigation Intelligence &amp; Criminal Network Analysis</div>
+      <div class="login-role">Secure Role-Based Access</div>
+    </div>
+    """, unsafe_allow_html=True)
+    with st.form("crimesphere_login", clear_on_submit=False):
+        username = st.text_input("Username", placeholder="Enter your username")
+        password = st.text_input("Password", type="password", placeholder="Enter your password")
+        submitted = st.form_submit_button("Sign in", type="primary", use_container_width=True)
+    if submitted:
+        users = load_users()
+        record = users.get(username.strip().lower())
+        if record and record.get("active", True) and record.get("password_hash") == _password_hash(password):
+            role = record.get("role", "Police")
+            if role not in ROLE_PAGES:
+                st.error("Account has an invalid role. Contact an administrator.")
+                return
+            st.session_state.authenticated = True
+            st.session_state.username = username.strip().lower()
+            st.session_state.role = role
+            st.session_state.category = ROLE_CATEGORY[role]
+            st.session_state.page = "Dashboard"
+            st.rerun()
+        else:
+            st.error("Invalid username/password or inactive account.")
+    st.markdown("""<div class="login-note"><b>Access categories</b><br>Category A: Administrators have full application access.<br>Category B: Police and Investigators have operational investigation access; administration/settings are restricted.</div>""", unsafe_allow_html=True)
+    st.caption("For the first local run, demo accounts are created automatically. Change their passwords before deployment.")
+
+# Authenticate before loading the investigation workspace.
+if not st.session_state.get("authenticated", False):
+    render_login()
+    st.stop()
 
 # ============================================================
 # THEME
@@ -1034,6 +1172,16 @@ forensic = read_csv(FILES["forensic"])
 assessment = read_csv(FILES["assessment"])
 G = read_graph(FILES["graph"])
 
+persons_master = read_csv(FILES["persons_master"])
+phones = read_csv(FILES["phones"])
+vehicles = read_csv(FILES["vehicles"])
+vehicle_events = read_csv(FILES["vehicle_events"])
+bank_accounts = read_csv(FILES["bank_accounts"])
+devices = read_csv(FILES["devices"])
+surveillance = read_csv(FILES["surveillance"])
+locations_master = read_csv(FILES["locations_master"])
+organizations = read_csv(FILES["organizations"])
+
 def clean_id_columns(df):
     if df.empty:
         return df
@@ -1050,6 +1198,15 @@ case_assoc = clean_id_columns(case_assoc)
 cases = clean_id_columns(cases)
 forensic = clean_id_columns(forensic)
 assessment = clean_id_columns(assessment)
+persons_master = clean_id_columns(persons_master)
+phones = clean_id_columns(phones)
+vehicles = clean_id_columns(vehicles)
+vehicle_events = clean_id_columns(vehicle_events)
+bank_accounts = clean_id_columns(bank_accounts)
+devices = clean_id_columns(devices)
+surveillance = clean_id_columns(surveillance)
+locations_master = clean_id_columns(locations_master)
+organizations = clean_id_columns(organizations)
 
 # ============================================================
 # DERIVED METRICS
@@ -1060,6 +1217,8 @@ def person_ids():
 
     if "person_id" in assessment.columns:
         ids.update(assessment["person_id"].dropna().astype(str))
+    if "person_id" in persons_master.columns:
+        ids.update(persons_master["person_id"].dropna().astype(str))
 
     for df, cols in [
         (cdr, ["caller_person_id", "receiver_person_id"]),
@@ -1067,6 +1226,12 @@ def person_ids():
         (locations, ["person_id"]),
         (case_assoc, ["person_id"]),
         (forensic, ["person_id"]),
+        (phones, ["person_id"]),
+        (vehicles, ["owner_person_id"]),
+        (vehicle_events, ["person_id"]),
+        (bank_accounts, ["person_id"]),
+        (devices, ["person_id"]),
+        (surveillance, ["person_id"]),
     ]:
         for col in cols:
             if col in df.columns:
@@ -1171,6 +1336,12 @@ NAV = [
     ]),
 ]
 
+allowed_pages = set(ROLE_PAGES.get(st.session_state.get("role", "Police"), ROLE_PAGES["Police"]))
+NAV = [
+    (section, [(icon, label) for icon, label in items if label in allowed_pages])
+    for section, items in NAV
+]
+NAV = [(section, items) for section, items in NAV if items]
 valid_pages = [label for _, items in NAV for _, label in items]
 
 # Allow the HTML navigation links to control the Streamlit page.
@@ -1181,6 +1352,16 @@ except Exception:
 
 if requested_page in valid_pages:
     st.session_state.page = requested_page
+elif st.session_state.get("page") not in valid_pages:
+    st.session_state.page = "Dashboard"
+
+# Visible identity / logout control.
+identity_left, identity_right = st.columns([7, 1])
+with identity_left:
+    st.caption(f"Signed in as **{st.session_state.get('username', '')}** · {ROLE_LABEL.get(st.session_state.get('role', ''), '')}")
+with identity_right:
+    if st.button("Logout", key="top_logout", use_container_width=True):
+        _logout()
 
 if st.session_state.sidebar_collapsed:
     st.markdown(
@@ -1311,8 +1492,951 @@ def frequent_activity_status(activity_count):
     return "LOW ACTIVITY", "crime-green"
 
 # ============================================================
-# DASHBOARD — REFERENCE IMAGE OUTPUT
+# AI / INTELLIGENCE CAPABILITY HELPERS
 # ============================================================
+
+def _numeric_series(df, candidates):
+    for col in candidates:
+        if col in df.columns:
+            return pd.to_numeric(df[col], errors="coerce")
+    return None
+
+
+def _date_series(df, candidates):
+    for col in candidates:
+        if col in df.columns:
+            return pd.to_datetime(df[col], errors="coerce")
+    return None
+
+
+def _lat_lon_columns(df):
+    lat = next((c for c in ["latitude", "lat", "Latitude", "LAT"] if c in df.columns), None)
+    lon = next((c for c in ["longitude", "lon", "lng", "Longitude", "LON"] if c in df.columns), None)
+    return lat, lon
+
+
+def build_multisource_person_profile(person):
+    """Unify available CDR, transaction, location, case and forensic records."""
+    pid = str(person)
+    profile = {
+        "person_id": pid,
+        "cdr_records": 0,
+        "transaction_records": 0,
+        "location_records": 0,
+        "case_records": 0,
+        "forensic_records": 0,
+        "network_degree": int(G.degree(pid)) if pid in G else 0,
+    }
+    if {"caller_person_id", "receiver_person_id"}.issubset(cdr.columns):
+        profile["cdr_records"] = int((cdr["caller_person_id"].astype(str).eq(pid) | cdr["receiver_person_id"].astype(str).eq(pid)).sum())
+    if {"sender_person_id", "receiver_person_id"}.issubset(transactions.columns):
+        profile["transaction_records"] = int((transactions["sender_person_id"].astype(str).eq(pid) | transactions["receiver_person_id"].astype(str).eq(pid)).sum())
+    if "person_id" in locations.columns:
+        profile["location_records"] = int(locations["person_id"].astype(str).eq(pid).sum())
+    if "person_id" in case_assoc.columns:
+        profile["case_records"] = int(case_assoc["person_id"].astype(str).eq(pid).sum())
+    if "person_id" in forensic.columns:
+        profile["forensic_records"] = int(forensic["person_id"].astype(str).eq(pid).sum())
+    return profile
+
+
+def explain_score(person):
+    """Produce transparent, deterministic score contributors from available evidence."""
+    profile = build_multisource_person_profile(person)
+    raw = {
+        "CDR connections": min(profile["cdr_records"], 20),
+        "Financial connections": min(profile["transaction_records"], 20),
+        "Location activity": min(profile["location_records"], 20),
+        "Case associations": min(profile["case_records"], 20),
+        "Forensic records": min(profile["forensic_records"], 20),
+    }
+    total = sum(raw.values())
+    # If a precomputed assessment exists, preserve it as the displayed score.
+    displayed = score_for_person(person)
+    return raw, displayed, profile
+
+
+def render_xai_panel(person):
+    contributors, displayed, profile = explain_score(person)
+    st.markdown("### Explainable AI — Why This Score?")
+    st.caption("The panel exposes the available evidence signals behind the investigation indicator. It is not a guilt or probability determination.")
+    cols = st.columns(5)
+    for col, (label, value) in zip(cols, contributors.items()):
+        col.metric(label, value)
+    st.progress(int(max(0, min(100, displayed))), text=f"Investigative Score: {displayed:.1f}/100 · {score_range(displayed)}")
+    st.dataframe(pd.DataFrame([profile]), use_container_width=True, hide_index=True)
+
+
+def _person_display_name(person_id):
+    """Return the real person name when persons.csv is available."""
+    pid = str(person_id)
+    if not persons_master.empty and {"person_id", "name"}.issubset(persons_master.columns):
+        row = persons_master[persons_master["person_id"].astype(str).eq(pid)]
+        if not row.empty:
+            value = str(row.iloc[0]["name"]).strip()
+            if value and value.lower() != "nan":
+                return value
+    return pid
+
+
+def _entity_label(node_type, node_id, person_id=None):
+    """Create the compact label shown below an icon node."""
+    nid = str(node_id)
+    if node_type == "person":
+        return _person_display_name(nid)
+    if node_type == "phone":
+        if not phones.empty and {"phone_id", "phone_number"}.issubset(phones.columns):
+            row = phones[phones["phone_id"].astype(str).eq(nid)]
+            if not row.empty:
+                return str(row.iloc[0]["phone_number"])
+        return nid
+    if node_type == "vehicle":
+        if not vehicles.empty and {"vehicle_id", "registration_number"}.issubset(vehicles.columns):
+            row = vehicles[vehicles["vehicle_id"].astype(str).eq(nid)]
+            if not row.empty:
+                return str(row.iloc[0]["registration_number"])
+        return nid
+    if node_type == "bank_account":
+        if not bank_accounts.empty and {"account_id", "account_number"}.issubset(bank_accounts.columns):
+            row = bank_accounts[bank_accounts["account_id"].astype(str).eq(nid)]
+            if not row.empty:
+                return str(row.iloc[0]["account_number"])
+        return nid
+    if node_type == "organization":
+        if not organizations.empty and {"organization_id", "name"}.issubset(organizations.columns):
+            row = organizations[organizations["organization_id"].astype(str).eq(nid)]
+            if not row.empty:
+                return str(row.iloc[0]["name"])
+        return nid
+    if node_type == "location":
+        if not locations_master.empty and {"location_id", "location_name"}.issubset(locations_master.columns):
+            row = locations_master[locations_master["location_id"].astype(str).eq(nid)]
+            if not row.empty:
+                return str(row.iloc[0]["location_name"])
+        return nid
+    if node_type == "case":
+        if not cases.empty and "case_id" in cases.columns:
+            row = cases[cases["case_id"].astype(str).eq(nid)]
+            if not row.empty:
+                if "crime_type" in row.columns:
+                    return f"{nid} · {row.iloc[0]['crime_type']}"
+        return nid
+    if node_type == "device":
+        if not devices.empty and {"device_id", "device_type"}.issubset(devices.columns):
+            row = devices[devices["device_id"].astype(str).eq(nid)]
+            if not row.empty:
+                return f"{nid} · {row.iloc[0]['device_type']}"
+        return nid
+    return nid
+
+
+def _add_node(H, node_id, node_type, label=None):
+    H.add_node(str(node_id), node_type=node_type, display_label=label or _entity_label(node_type, node_id))
+
+
+def build_person_to_person_network(person_a, person_b, max_per_type=8):
+    """Build a focused multi-source investigation graph around two selected people.
+
+    This deliberately builds the Network Explorer graph from the project's CSV entity
+    tables rather than showing the dense all-person GraphML network. That produces the
+    person-to-person investigation format shown in the supplied reference image.
+    """
+    a, b = str(person_a), str(person_b)
+    H = nx.Graph()
+    _add_node(H, a, "person", _person_display_name(a))
+    _add_node(H, b, "person", _person_display_name(b))
+
+    def add_relation(u, v, relation):
+        if u == v:
+            return
+        H.add_edge(str(u), str(v), relationship=relation)
+
+    # Direct CDR person-to-person evidence.
+    if {"caller_person_id", "receiver_person_id"}.issubset(cdr.columns):
+        mask = (
+            ((cdr["caller_person_id"].astype(str) == a) & (cdr["receiver_person_id"].astype(str) == b))
+            | ((cdr["caller_person_id"].astype(str) == b) & (cdr["receiver_person_id"].astype(str) == a))
+        )
+        if int(mask.sum()) > 0:
+            add_relation(a, b, f"CALLS · {int(mask.sum())}")
+
+    # Direct financial person-to-person evidence.
+    if {"sender_person_id", "receiver_person_id"}.issubset(transactions.columns):
+        mask = (
+            ((transactions["sender_person_id"].astype(str) == a) & (transactions["receiver_person_id"].astype(str) == b))
+            | ((transactions["sender_person_id"].astype(str) == b) & (transactions["receiver_person_id"].astype(str) == a))
+        )
+        if int(mask.sum()) > 0:
+            if H.has_edge(a, b):
+                H[a][b]["relationship"] += f" · FINANCIAL · {int(mask.sum())}"
+            else:
+                add_relation(a, b, f"FINANCIAL · {int(mask.sum())}")
+
+    people = [a, b]
+    for pid in people:
+        # Phones
+        if {"phone_id", "person_id"}.issubset(phones.columns):
+            rows = phones[phones["person_id"].astype(str).eq(pid)].head(max_per_type)
+            for _, r in rows.iterrows():
+                nid = f"PH:{r['phone_id']}"
+                _add_node(H, nid, "phone", str(r.get("phone_number", r["phone_id"])))
+                add_relation(pid, nid, "PHONE")
+
+        # Vehicles: owner + event vehicles used by the person.
+        vehicle_ids = []
+        if {"vehicle_id", "owner_person_id"}.issubset(vehicles.columns):
+            vehicle_ids.extend(vehicles.loc[vehicles["owner_person_id"].astype(str).eq(pid), "vehicle_id"].astype(str).tolist())
+        if {"vehicle_id", "person_id"}.issubset(vehicle_events.columns):
+            vehicle_ids.extend(vehicle_events.loc[vehicle_events["person_id"].astype(str).eq(pid), "vehicle_id"].astype(str).tolist())
+        for vid in list(dict.fromkeys(vehicle_ids))[:max_per_type]:
+            nid = f"VEH:{vid}"
+            _add_node(H, nid, "vehicle", _entity_label("vehicle", vid))
+            add_relation(pid, nid, "VEHICLE")
+
+        # Bank accounts
+        if {"account_id", "person_id"}.issubset(bank_accounts.columns):
+            rows = bank_accounts[bank_accounts["person_id"].astype(str).eq(pid)].head(max_per_type)
+            for _, r in rows.iterrows():
+                aid = str(r["account_id"])
+                nid = f"BA:{aid}"
+                _add_node(H, nid, "bank_account", _entity_label("bank_account", aid))
+                add_relation(pid, nid, "BANK ACCOUNT")
+
+        # Devices
+        if {"device_id", "person_id"}.issubset(devices.columns):
+            rows = devices[devices["person_id"].astype(str).eq(pid)].head(max_per_type)
+            for _, r in rows.iterrows():
+                did = str(r["device_id"])
+                nid = f"DEV:{did}"
+                _add_node(H, nid, "device", _entity_label("device", did))
+                add_relation(pid, nid, "DEVICE")
+
+        # Locations from both location events and surveillance events.
+        loc_ids = []
+        if {"person_id", "location_id"}.issubset(locations.columns):
+            loc_ids.extend(locations.loc[locations["person_id"].astype(str).eq(pid), "location_id"].astype(str).tolist())
+        if {"person_id", "location_id"}.issubset(surveillance.columns):
+            loc_ids.extend(surveillance.loc[surveillance["person_id"].astype(str).eq(pid), "location_id"].astype(str).tolist())
+        for lid in list(dict.fromkeys(loc_ids))[:max_per_type]:
+            nid = f"LOC:{lid}"
+            _add_node(H, nid, "location", _entity_label("location", lid))
+            add_relation(pid, nid, "LOCATION")
+
+        # Cases associated with the person.
+        if {"person_id", "case_id"}.issubset(case_assoc.columns):
+            rows = case_assoc[case_assoc["person_id"].astype(str).eq(pid)].head(max_per_type)
+            for _, r in rows.iterrows():
+                cid = str(r["case_id"])
+                nid = f"CASE:{cid}"
+                _add_node(H, nid, "case", _entity_label("case", cid))
+                add_relation(pid, nid, "CASE")
+
+        # Forensic evidence as individual evidence nodes.
+        if {"person_id", "report_id"}.issubset(forensic.columns):
+            rows = forensic[forensic["person_id"].astype(str).eq(pid)].head(max_per_type)
+            for _, r in rows.iterrows():
+                eid = str(r["report_id"])
+                nid = f"EVD:{eid}"
+                _add_node(H, nid, "evidence", eid)
+                add_relation(pid, nid, "EVIDENCE")
+
+        # Bring across organization nodes only when the existing GraphML proves a
+        # person-to-organization edge. There is no fabricated person-org mapping.
+        if pid in G:
+            for n in G.neighbors(pid):
+                attrs = G.nodes[n]
+                raw_type = str(attrs.get("type", attrs.get("node_type", attrs.get("entity_type", "")))).lower()
+                if raw_type in {"organization", "org", "company"}:
+                    nid = f"ORG:{n}"
+                    _add_node(H, nid, "organization", str(attrs.get("name", n)))
+                    add_relation(pid, nid, "ORGANIZATION")
+
+    # Explicit common entities make the person-to-person investigation relationship
+    # visible even when there is no direct person-person edge.
+    for prefix, typ in [("LOC:", "location"), ("CASE:", "case")]:
+        shared = [n for n in H.nodes if str(n).startswith(prefix) and H.has_edge(a, n) and H.has_edge(b, n)]
+        for n in shared:
+            H[a][n]["relationship"] = "COMMON LOCATION" if typ == "location" else "COMMON CASE"
+            H[b][n]["relationship"] = H[a][n]["relationship"]
+
+    # Also show direct common vehicles/accounts/devices as shared evidence links.
+    for prefix, rel in [("VEH:", "COMMON VEHICLE"), ("BA:", "COMMON BANK ACCOUNT"), ("DEV:", "COMMON DEVICE")]:
+        for n in [n for n in H.nodes if str(n).startswith(prefix) and H.has_edge(a, n) and H.has_edge(b, n)]:
+            H[a][n]["relationship"] = rel
+            H[b][n]["relationship"] = rel
+
+    return H
+
+
+def render_person_to_person_network(person_a, person_b):
+    """Render the Network Explorer graph as browser SVG so Windows emoji render natively."""
+    H = build_person_to_person_network(person_a, person_b)
+    if H.number_of_nodes() < 2:
+        st.info("Not enough entity records are available for the selected people.")
+        return
+
+    st.markdown("### Person-to-Person Investigation Network")
+    st.caption(
+        f"{_person_display_name(person_a)} ↔ {_person_display_name(person_b)} · 2023 – 2026 · Multi-source evidence view"
+    )
+
+    ICONS = {
+        "person": "👤", "phone": "☎", "vehicle": "🚗",
+        "bank_account": "🏦", "organization": "🏢", "location": "📍",
+        "case": "📁", "device": "💻", "evidence": "E",
+    }
+    COLORS = {
+        "person": "#2B78B5", "phone": "#4B82C4", "vehicle": "#4E9B51",
+        "bank_account": "#D18A2B", "organization": "#8B5FA7", "location": "#C96D43",
+        "case": "#B35B7C", "device": "#3E8F8F", "evidence": "#7C6A50",
+    }
+
+    people = [str(person_a), str(person_b)]
+    entities = [n for n in H.nodes if n not in people]
+    entities.sort(key=lambda n: (str(H.nodes[n].get("node_type", "")), str(n)))
+
+    W, HGT = 1120, 690
+    positions = {people[0]: (430, 335), people[1]: (650, 335)}
+    rings = [[], [], []]
+    for i, n in enumerate(entities):
+        rings[min(i // 12, 2)].append(n)
+    radii = [(260, 185), (370, 260), (450, 315)]
+    for ring_idx, nodes in enumerate(rings):
+        if not nodes:
+            continue
+        rx, ry = radii[ring_idx]
+        count = len(nodes)
+        for j, n in enumerate(nodes):
+            angle = (2 * np.pi * j / count) - np.pi / 2 + (0.10 * ring_idx)
+            positions[n] = (540 + rx * np.cos(angle), 345 + ry * np.sin(angle))
+
+    def esc(v):
+        return html.escape(str(v), quote=True)
+
+    svg = [f"""<div style=\"width:100%;background:#fff;border:1px solid #e2e5e8;border-radius:12px;overflow:hidden;\">
+    <svg viewBox=\"0 0 {W} {HGT}\" width=\"100%\" role=\"img\" aria-label=\"Person to person investigation network\" style=\"display:block;background:#fff;font-family:Segoe UI,Arial,sans-serif;\">
+      <defs><filter id=\"softShadow\" x=\"-30%\" y=\"-30%\" width=\"160%\" height=\"160%\"><feDropShadow dx=\"0\" dy=\"2\" stdDeviation=\"3\" flood-opacity=\"0.16\"/></filter></defs>
+      <text x=\"560\" y=\"34\" text-anchor=\"middle\" font-size=\"23\" font-weight=\"700\" fill=\"#25313A\">Person-to-Person Investigation Network</text>
+      <text x=\"560\" y=\"55\" text-anchor=\"middle\" font-size=\"11\" fill=\"#7A858D\">{esc(_person_display_name(person_a))} ↔ {esc(_person_display_name(person_b))} · 2023 – 2026</text>
+      <rect x=\"18\" y=\"75\" width=\"1084\" height=\"570\" rx=\"10\" fill=\"#FFFFFF\"/>
+    """]
+
+    edge_colors = {
+        "PHONE": "#6B8FD3", "VEHICLE": "#6FA56F", "BANK ACCOUNT": "#D5A15A",
+        "DEVICE": "#69A6A6", "LOCATION": "#D28A67", "CASE": "#BF7894",
+        "EVIDENCE": "#9C8A70", "ORGANIZATION": "#9873AD", "COMMON LOCATION": "#DF6D9C",
+        "COMMON CASE": "#C95880", "COMMON VEHICLE": "#55A05A", "COMMON BANK ACCOUNT": "#D18A2B",
+        "COMMON DEVICE": "#4B9999",
+    }
+    for u, v, data in H.edges(data=True):
+        if u not in positions or v not in positions:
+            continue
+        x1, y1 = positions[u]; x2, y2 = positions[v]
+        rel = str(data.get("relationship", "RELATED"))
+        base = rel.split(" · ")[0]
+        if "FINANCIAL" in rel:
+            edge_color = "#C98B36"
+        elif "CALLS" in rel:
+            edge_color = "#5B8FF9"
+        else:
+            edge_color = edge_colors.get(base, "#A5A9AD")
+        direct = set([u, v]) == set(people)
+        width = 3 if direct else 1.25
+        opacity = 0.75 if direct else 0.42
+        svg.append(f'<line x1=\"{x1:.1f}\" y1=\"{y1:.1f}\" x2=\"{x2:.1f}\" y2=\"{y2:.1f}\" stroke=\"{edge_color}\" stroke-width=\"{width}\" opacity=\"{opacity}\"/>')
+
+    if H.has_edge(people[0], people[1]):
+        svg.append('<text x=\"540\" y=\"300\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"700\" fill=\"#4C708C\">PERSON ↔ PERSON</text>')
+
+    for node in H.nodes:
+        typ = str(H.nodes[node].get("node_type", "evidence"))
+        x, y = positions[node]
+        central = node in people
+        r = 31 if central else 21
+        stroke = COLORS.get(typ, "#7C6A50")
+        fill = "#EAF3FB" if central else "#FFFFFF"
+        icon = ICONS.get(typ, "E")
+        label = str(H.nodes[node].get("display_label", node))
+        if len(label) > 25:
+            label = label[:22] + "…"
+        label_y = y + r + 16
+        icon_size = 25 if central else 19
+        svg.append('<g filter=\"url(#softShadow)\">')
+        svg.append(f'<circle cx=\"{x:.1f}\" cy=\"{y:.1f}\" r=\"{r}\" fill=\"{fill}\" stroke=\"{stroke}\" stroke-width=\"2.4\"/>')
+        svg.append(f'<text x=\"{x:.1f}\" y=\"{y + icon_size*0.34:.1f}\" text-anchor=\"middle\" font-size=\"{icon_size}px\" font-weight=\"700\" fill=\"{stroke}\">{esc(icon)}</text>')
+        svg.append('</g>')
+        svg.append(f'<text x=\"{x:.1f}\" y=\"{label_y:.1f}\" text-anchor=\"middle\" font-size=\"{9.5 if central else 8}px\" font-weight=\"{700 if central else 400}\" fill=\"#343A40\">{esc(label)}</text>')
+
+    lx, ly = 900, 115
+    svg.append(f'<text x=\"{lx}\" y=\"{ly}\" font-size=\"12\" font-weight=\"700\" fill=\"#34414A\">Node Legend</text>')
+    legend = [("person", "Person"), ("phone", "Phone"), ("vehicle", "Vehicle"), ("bank_account", "Bank Account"), ("organization", "Organization"), ("location", "Location"), ("case", "Case"), ("device", "Device"), ("evidence", "Evidence")]
+    for i, (typ, name) in enumerate(legend):
+        yy = ly + 25 + i * 29
+        svg.append(f'<circle cx=\"{lx+8}\" cy=\"{yy}\" r=\"9\" fill=\"#fff\" stroke=\"{COLORS[typ]}\" stroke-width=\"1.8\"/>')
+        svg.append(f'<text x=\"{lx+8}\" y=\"{yy+3.5}\" text-anchor=\"middle\" font-size=\"10\">{esc(ICONS[typ])}</text>')
+        svg.append(f'<text x=\"{lx+25}\" y=\"{yy+4}\" font-size=\"9.5\" fill=\"#56616A\">{esc(name)}</text>')
+
+    svg.append(f'<text x=\"560\" y=\"625\" text-anchor=\"middle\" font-size=\"9.5\" fill=\"#7A838A\">Visible nodes: {H.number_of_nodes()}  •  Relationships: {H.number_of_edges()}</text>')
+    svg.append('</svg></div>')
+    components.html("".join(svg), height=720, scrolling=False)
+    return H
+
+
+
+
+# ============================================================
+# RESTORED CORE PAGE RENDERERS
+# ============================================================
+
+def render_geospatial_intelligence():
+    """Render geospatial intelligence by joining location events to the location master.
+
+    The project stores event coordinates indirectly: location_events.csv contains
+    location_id, while locations.csv contains latitude/longitude. This function
+    resolves that relationship automatically and never requires editing the CSVs.
+    """
+    st.markdown("### Predictive Analytics & Geospatial Intelligence")
+    st.caption("Location activity is mapped from location events joined to the location master dataset.")
+
+    if locations.empty:
+        st.info("No location-event data is available for geospatial analysis.")
+        return
+
+    # ------------------------------------------------------------
+    # 1. Build a geographic event table.
+    #    location_events.csv normally has location_id but no coordinates.
+    #    locations.csv supplies latitude/longitude for that location_id.
+    # ------------------------------------------------------------
+    geo = locations.copy()
+
+    # Normalize the join key even if one dataset was loaded with numeric IDs.
+    if "location_id" in geo.columns:
+        geo["location_id"] = geo["location_id"].astype(str).str.strip()
+
+    master = locations_master.copy() if not locations_master.empty else pd.DataFrame()
+    if not master.empty and "location_id" in master.columns:
+        master["location_id"] = master["location_id"].astype(str).str.strip()
+
+        # Prefer the authoritative master coordinates whenever the event table
+        # doesn't already contain valid coordinates.
+        lat_master = next((c for c in ["latitude", "lat", "Latitude", "LATITUDE"] if c in master.columns), None)
+        lon_master = next((c for c in ["longitude", "lon", "lng", "Longitude", "LONGITUDE"] if c in master.columns), None)
+
+        if lat_master and lon_master and "location_id" in geo.columns:
+            master_geo = master[["location_id", lat_master, lon_master] +
+                                [c for c in ["location_name", "city"] if c in master.columns]].copy()
+            master_geo = master_geo.drop_duplicates(subset=["location_id"])
+            geo = geo.merge(master_geo, on="location_id", how="left", suffixes=("", "_master"))
+
+            # If event data has coordinate columns, use them when valid; otherwise
+            # fill them from locations.csv.
+            event_lat = next((c for c in ["latitude", "lat", "Latitude", "LATITUDE"] if c in geo.columns), None)
+            event_lon = next((c for c in ["longitude", "lon", "lng", "Longitude", "LONGITUDE"] if c in geo.columns), None)
+
+            if event_lat:
+                geo["_latitude"] = pd.to_numeric(geo[event_lat], errors="coerce")
+            else:
+                geo["_latitude"] = np.nan
+            if event_lon:
+                geo["_longitude"] = pd.to_numeric(geo[event_lon], errors="coerce")
+            else:
+                geo["_longitude"] = np.nan
+
+            geo["_latitude"] = geo["_latitude"].fillna(pd.to_numeric(geo[lat_master], errors="coerce"))
+            geo["_longitude"] = geo["_longitude"].fillna(pd.to_numeric(geo[lon_master], errors="coerce"))
+
+            if "location_name_master" in geo.columns and "location_name" not in geo.columns:
+                geo["location_name"] = geo["location_name_master"]
+            elif "location_name_master" in geo.columns:
+                geo["location_name"] = geo["location_name"].fillna(geo["location_name_master"])
+
+            if "city_master" in geo.columns and "city" not in geo.columns:
+                geo["city"] = geo["city_master"]
+            elif "city_master" in geo.columns:
+                geo["city"] = geo["city"].fillna(geo["city_master"])
+        else:
+            geo["_latitude"] = np.nan
+            geo["_longitude"] = np.nan
+    else:
+        # Fallback: use coordinates directly from location events if present.
+        lat_col, lon_col = _lat_lon_columns(geo)
+        geo["_latitude"] = pd.to_numeric(geo[lat_col], errors="coerce") if lat_col else np.nan
+        geo["_longitude"] = pd.to_numeric(geo[lon_col], errors="coerce") if lon_col else np.nan
+
+    geo["_latitude"] = pd.to_numeric(geo["_latitude"], errors="coerce")
+    geo["_longitude"] = pd.to_numeric(geo["_longitude"], errors="coerce")
+
+    # Remove impossible coordinates and rows without a resolvable location.
+    geo = geo[
+        geo["_latitude"].between(-90, 90, inclusive="both") &
+        geo["_longitude"].between(-180, 180, inclusive="both")
+    ].copy()
+
+    if geo.empty:
+        st.error(
+            "Location events were found, but no valid coordinates could be resolved. "
+            "Make sure locations.csv contains location_id, latitude and longitude."
+        )
+        return
+
+    # ------------------------------------------------------------
+    # 2. Summary metrics.
+    # ------------------------------------------------------------
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Recorded Events", f"{len(geo):,}")
+    c2.metric("Mapped Locations", f"{geo['location_id'].nunique() if 'location_id' in geo.columns else len(geo):,}")
+    c3.metric("Persons Observed", f"{geo['person_id'].nunique() if 'person_id' in geo.columns else 0:,}")
+    c4.metric("Coordinates Resolved", f"{len(geo):,}")
+
+    # ------------------------------------------------------------
+    # 3. Actual activity map.
+    # ------------------------------------------------------------
+    map_df = geo[["_latitude", "_longitude"]].rename(columns={"_latitude": "lat", "_longitude": "lon"})
+    st.markdown("#### Recorded Activity Map")
+    st.map(map_df, size=18, zoom=None)
+
+    # ------------------------------------------------------------
+    # 4. Activity trend + transparent forecast.
+    # ------------------------------------------------------------
+    date_col = safe_date_column(
+        geo,
+        ["event_date", "date", "timestamp", "datetime", "created_at"]
+    )
+
+    if date_col:
+        parsed_dates = pd.to_datetime(geo[date_col], errors="coerce")
+        dated = geo.loc[parsed_dates.notna()].copy()
+        dated["_event_datetime"] = parsed_dates.loc[dated.index]
+
+        if not dated.empty:
+            dated["period"] = dated["_event_datetime"].dt.to_period("M").astype(str)
+            trend = dated.groupby("period").size().reset_index(name="activity")
+            trend = trend.sort_values("period")
+
+            st.markdown("#### Hotspot Activity Trend")
+            st.line_chart(trend.set_index("period")["activity"], height=280)
+
+            if len(trend) >= 3:
+                y = trend["activity"].astype(float).to_numpy()
+                x = np.arange(len(y), dtype=float)
+                slope, intercept = np.polyfit(x, y, 1)
+                forecast = max(0.0, float(slope * len(y) + intercept))
+                st.metric("Next-period predicted activity", f"{forecast:.1f}")
+                st.caption(
+                    "Forecast uses a transparent linear trend over historical location-event counts. "
+                    "It is an operational planning indicator, not a certainty about future crime."
+                )
+
+            # --------------------------------------------------------
+            # 5. Highest-activity locations with names when available.
+            # --------------------------------------------------------
+            st.markdown("#### Highest-Activity Locations")
+            group_cols = ["_latitude", "_longitude"]
+            if "location_id" in dated.columns:
+                group_cols = ["location_id"] + group_cols
+
+            hotspots = dated.groupby(group_cols).size().reset_index(name="activity")
+            hotspots = hotspots.sort_values("activity", ascending=False).head(10)
+
+            if "location_id" in hotspots.columns and not master.empty and "location_id" in master.columns:
+                display_cols = [c for c in ["location_id", "location_name", "city", "latitude", "longitude"] if c in master.columns]
+                if display_cols:
+                    master_display = master[display_cols].drop_duplicates("location_id")
+                    hotspots = hotspots.merge(master_display, on="location_id", how="left")
+
+            rename_map = {
+                "_latitude": "Latitude",
+                "_longitude": "Longitude",
+                "activity": "Activity Events",
+            }
+            hotspots = hotspots.rename(columns=rename_map)
+            st.dataframe(hotspots, use_container_width=True, hide_index=True)
+        else:
+            st.info("No valid event dates are available for the trend and forecast.")
+    else:
+        st.info("No event-date column was found. The activity map is still available.")
+
+
+FINGERPRINT_REGISTRY_COLUMNS = [
+    "image_id",
+    "person_id",
+    "case_id",
+    "original_filename",
+    "stored_filename",
+    "stored_path",
+    "sha256",
+    "uploaded_at",
+    "verification_status",
+    "notes",
+]
+
+
+def _safe_filename(filename):
+    """Return a filesystem-safe filename while preserving the extension."""
+    name = Path(str(filename)).name
+    stem = re.sub(r"[^A-Za-z0-9._-]+", "_", Path(name).stem).strip("._") or "fingerprint"
+    suffix = Path(name).suffix.lower()
+    if suffix not in {".jpg", ".jpeg"}:
+        suffix = ".jpg"
+    return f"{stem}{suffix}"
+
+
+def _load_fingerprint_registry():
+    path = FILES["fingerprint_registry"]
+    if path.exists():
+        try:
+            df = pd.read_csv(path, dtype=str).fillna("")
+        except Exception:
+            df = pd.DataFrame(columns=FINGERPRINT_REGISTRY_COLUMNS)
+    else:
+        df = pd.DataFrame(columns=FINGERPRINT_REGISTRY_COLUMNS)
+    for col in FINGERPRINT_REGISTRY_COLUMNS:
+        if col not in df.columns:
+            df[col] = ""
+    return df[FINGERPRINT_REGISTRY_COLUMNS].copy()
+
+
+def _save_fingerprint_registry(df):
+    path = FILES["fingerprint_registry"]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path, index=False)
+
+
+def _store_fingerprint_image(uploaded_file, person_id, case_id, notes, verification_status):
+    """Persist a JPG/JPEG fingerprint evidence image and its audit metadata."""
+    image_bytes = uploaded_file.getvalue()
+    digest = hashlib.sha256(image_bytes).hexdigest()
+    registry = _load_fingerprint_registry()
+
+    # Avoid storing the same image more than once.
+    duplicate = registry[registry["sha256"].astype(str).eq(digest)]
+    if not duplicate.empty:
+        return duplicate.iloc[0].to_dict(), False
+
+    image_dir = FILES["fingerprint_images_dir"]
+    image_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_name = _safe_filename(uploaded_file.name)
+    image_id = f"FPIMG-{datetime.now().strftime('%Y%m%d%H%M%S')}-{digest[:10]}"
+    stored_filename = f"{image_id}_{safe_name}"
+    destination = image_dir / stored_filename
+    destination.write_bytes(image_bytes)
+
+    row = {
+        "image_id": image_id,
+        "person_id": str(person_id),
+        "case_id": str(case_id) if case_id else "",
+        "original_filename": str(uploaded_file.name),
+        "stored_filename": stored_filename,
+        "stored_path": str(destination.relative_to(DATA_DIR)),
+        "sha256": digest,
+        "uploaded_at": datetime.now().isoformat(timespec="seconds"),
+        "verification_status": str(verification_status),
+        "notes": str(notes or ""),
+    }
+    registry = pd.concat([registry, pd.DataFrame([row])], ignore_index=True)
+    _save_fingerprint_registry(registry)
+    return row, True
+
+
+def _render_fingerprint_upload():
+    """JPG/JPEG fingerprint evidence upload and manual review registry."""
+    st.markdown("### Upload Fingerprint Evidence")
+    st.caption(
+        "Upload a fingerprint image in JPG/JPEG format and associate it with an existing person/case. "
+        "Images are stored locally under data/raw/fingerprint_images and indexed in a separate registry."
+    )
+
+    if not persons:
+        st.warning("No person records are available, so a fingerprint image cannot be associated with a person yet.")
+        return
+
+    upload_cols = st.columns([1, 1, 1])
+    with upload_cols[0]:
+        selected_person = st.selectbox(
+            "Person",
+            persons,
+            key="fingerprint_upload_person",
+        )
+    with upload_cols[1]:
+        case_options = [""]
+        if not cases.empty and "case_id" in cases.columns:
+            case_options += cases["case_id"].dropna().astype(str).unique().tolist()
+        selected_case = st.selectbox(
+            "Case (optional)",
+            case_options,
+            key="fingerprint_upload_case",
+        )
+    with upload_cols[2]:
+        verification_status = st.selectbox(
+            "Review status",
+            ["Pending Review", "Reviewed", "Manual Match", "Manual No Match"],
+            key="fingerprint_upload_status",
+        )
+
+    uploaded = st.file_uploader(
+        "Choose fingerprint JPG/JPEG",
+        type=["jpg", "jpeg"],
+        accept_multiple_files=True,
+        key="fingerprint_jpg_uploader",
+        help="Only JPG/JPEG files are accepted by this uploader.",
+    )
+    notes = st.text_area(
+        "Evidence notes (optional)",
+        key="fingerprint_upload_notes",
+        placeholder="Source item, examiner note, collection context, or other audit information...",
+    )
+
+    if uploaded:
+        st.markdown("#### Upload preview")
+        preview_cols = st.columns(min(3, len(uploaded)))
+        for idx, item in enumerate(uploaded):
+            with preview_cols[idx % len(preview_cols)]:
+                st.image(item, caption=item.name, use_container_width=True)
+
+        if st.button("Save Fingerprint Evidence", type="primary", key="save_fingerprint_evidence"):
+            saved = 0
+            duplicates = 0
+            for item in uploaded:
+                try:
+                    _, created = _store_fingerprint_image(
+                        item,
+                        selected_person,
+                        selected_case,
+                        notes,
+                        verification_status,
+                    )
+                    if created:
+                        saved += 1
+                    else:
+                        duplicates += 1
+                except Exception as exc:
+                    st.error(f"Could not save {item.name}: {exc}")
+            if saved:
+                st.success(f"Saved {saved} fingerprint image(s) for {selected_person}.")
+            if duplicates:
+                st.info(f"Skipped {duplicates} duplicate image(s) based on SHA-256 hash.")
+            st.rerun()
+
+
+def _render_fingerprint_registry():
+    registry = _load_fingerprint_registry()
+    st.markdown("### Uploaded Fingerprint Evidence")
+    if registry.empty:
+        st.info("No JPG/JPEG fingerprint images have been uploaded yet.")
+        return
+
+    filter_cols = st.columns(3)
+    with filter_cols[0]:
+        person_filter = st.selectbox(
+            "Filter by person",
+            ["All"] + sorted(registry["person_id"].astype(str).unique().tolist()),
+            key="fingerprint_registry_person",
+        )
+    with filter_cols[1]:
+        status_filter = st.selectbox(
+            "Filter by status",
+            ["All"] + sorted(registry["verification_status"].astype(str).unique().tolist()),
+            key="fingerprint_registry_status",
+        )
+    with filter_cols[2]:
+        case_filter = st.selectbox(
+            "Filter by case",
+            ["All"] + sorted([x for x in registry["case_id"].astype(str).unique().tolist() if x]),
+            key="fingerprint_registry_case",
+        )
+
+    filtered = registry.copy()
+    if person_filter != "All":
+        filtered = filtered[filtered["person_id"].astype(str).eq(person_filter)]
+    if status_filter != "All":
+        filtered = filtered[filtered["verification_status"].astype(str).eq(status_filter)]
+    if case_filter != "All":
+        filtered = filtered[filtered["case_id"].astype(str).eq(case_filter)]
+
+    st.dataframe(
+        filtered.drop(columns=["sha256", "stored_path"], errors="ignore"),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    if not filtered.empty:
+        selected_image_id = st.selectbox(
+            "Preview uploaded fingerprint",
+            filtered["image_id"].tolist(),
+            key="fingerprint_preview_id",
+        )
+        row = filtered[filtered["image_id"].eq(selected_image_id)].iloc[0]
+        image_path = DATA_DIR / row["stored_path"]
+        if image_path.exists():
+            st.image(
+                str(image_path),
+                caption=f"{row['original_filename']} · {row['person_id']} · {row['verification_status']}",
+                width=420,
+            )
+        else:
+            st.warning("The registry entry exists, but its image file could not be found on disk.")
+
+
+def render_biometric_intelligence():
+    """Biometric evidence management: forensic records plus JPG/JPEG uploads."""
+    st.markdown("### Biometric & Forensic Intelligence")
+    st.caption(
+        "Fingerprint images can be uploaded and associated with a person or case for forensic evidence management. "
+        "This application does not perform automated fingerprint identification or authenticate a person's identity from an uploaded image. "
+        "Any match decision must come from a validated forensic process and authorized human review."
+    )
+
+    _render_fingerprint_upload()
+    _render_fingerprint_registry()
+
+    st.markdown("### Forensic Report Register")
+    if forensic.empty:
+        st.info("No forensic fingerprint report records are available in the CSV dataset.")
+        return
+
+    status_col = next((c for c in ["match_status", "status", "match_result"] if c in forensic.columns), None)
+    if status_col:
+        status_counts = forensic[status_col].fillna("Unknown").astype(str).value_counts()
+        st.bar_chart(status_counts, height=280)
+    cols = st.columns(4)
+    cols[0].metric("Fingerprint reports", len(forensic))
+    cols[1].metric("Unique persons", forensic["person_id"].nunique() if "person_id" in forensic.columns else 0)
+    cols[2].metric("Unique cases", forensic["case_id"].nunique() if "case_id" in forensic.columns else 0)
+    cols[3].metric("Match statuses", forensic[status_col].nunique() if status_col else 0)
+    st.dataframe(forensic, use_container_width=True, hide_index=True)
+
+
+def _persist_new_case(case_row, association_row):
+    """Persist a newly created case and its primary-person association."""
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    cases_path = FILES["cases"]
+    assoc_path = FILES["case_assoc"]
+
+    current_cases = pd.read_csv(cases_path) if cases_path.exists() else pd.DataFrame()
+    current_assoc = pd.read_csv(assoc_path) if assoc_path.exists() else pd.DataFrame()
+
+    # Preserve the existing CSV schema and append only known columns.
+    case_columns = list(current_cases.columns) if not current_cases.empty else [
+        "case_id", "fir_number", "crime_type", "case_date", "location_id"
+    ]
+    assoc_columns = list(current_assoc.columns) if not current_assoc.empty else [
+        "association_id", "case_id", "person_id", "relationship"
+    ]
+
+    case_to_append = {col: case_row.get(col, "") for col in case_columns}
+    assoc_to_append = {col: association_row.get(col, "") for col in assoc_columns}
+
+    current_cases = pd.concat([current_cases, pd.DataFrame([case_to_append])], ignore_index=True)
+    current_assoc = pd.concat([current_assoc, pd.DataFrame([assoc_to_append])], ignore_index=True)
+
+    current_cases.to_csv(cases_path, index=False)
+    current_assoc.to_csv(assoc_path, index=False)
+
+
+def _next_case_id():
+    """Generate the next C### case identifier without overwriting an existing case."""
+    existing = set(cases.get("case_id", pd.Series(dtype=str)).dropna().astype(str)) if not cases.empty else set()
+    numbers = []
+    for value in existing:
+        m = re.fullmatch(r"C(\d+)", value.strip(), flags=re.I)
+        if m:
+            numbers.append(int(m.group(1)))
+    n = max(numbers, default=0) + 1
+    candidate = f"C{n:03d}"
+    while candidate in existing:
+        n += 1
+        candidate = f"C{n:03d}"
+    return candidate
+
+
+def _next_association_id():
+    existing = set(case_assoc.get("association_id", pd.Series(dtype=str)).dropna().astype(str)) if not case_assoc.empty else set()
+    numbers = []
+    for value in existing:
+        m = re.fullmatch(r"CA(\d+)", value.strip(), flags=re.I)
+        if m:
+            numbers.append(int(m.group(1)))
+    n = max(numbers, default=0) + 1
+    candidate = f"CA{n:03d}"
+    while candidate in existing:
+        n += 1
+        candidate = f"CA{n:03d}"
+    return candidate
+
+
+def _open_case_person(person_id, case_id=None):
+    """Open Individual Investigation for the selected case/person."""
+    st.session_state.page = "Individual Investigation"
+    st.session_state.individual_investigation_select = str(person_id)
+    if case_id:
+        st.session_state.selected_case_id = str(case_id)
+    st.rerun()
+
+
+def render_new_case_form():
+    """Interactive new-case form available directly from the Dashboard."""
+    st.markdown("### Create New Case")
+    st.caption("Add a case to the existing case register and optionally link its primary person. The data is written to data/raw/cases.csv and case_associations.csv.")
+
+    with st.form("new_case_form", clear_on_submit=True):
+        c1, c2 = st.columns(2)
+        with c1:
+            case_id_input = st.text_input("Case ID", value=_next_case_id(), help="Leave the generated ID unless you have a specific case identifier.")
+            fir_number = st.text_input("FIR Number", value=f"FIR-{datetime.now().year}-{len(cases)+1:04d}")
+            crime_type = st.text_input("Crime Type", value="Investigation")
+        with c2:
+            case_date = st.date_input("Case Date", value=datetime.now().date())
+            location_options = ["— None —"]
+            if not locations_master.empty and "location_id" in locations_master.columns:
+                location_options += sorted(locations_master["location_id"].dropna().astype(str).unique().tolist())
+            location_id = st.selectbox("Location", location_options)
+            person_options = ["— None —"] + persons
+            primary_person = st.selectbox(
+                "Primary Person",
+                person_options,
+                format_func=lambda p: "— None —" if p == "— None —" else f"{p} — {_person_display_name(p)}",
+            )
+
+        relationship = st.selectbox("Primary Person Relationship", ["Suspect", "Person of Interest", "Witness", "Victim", "Other"], index=0)
+        submitted = st.form_submit_button("Create Case", type="primary", use_container_width=True)
+
+    if not submitted:
+        return
+
+    case_id = str(case_id_input).strip()
+    if not case_id:
+        st.error("Case ID cannot be empty.")
+        return
+
+    existing_ids = set(cases["case_id"].dropna().astype(str)) if "case_id" in cases.columns else set()
+    if case_id in existing_ids:
+        st.error(f"Case ID {case_id} already exists. Please use a unique ID.")
+        return
+
+    case_row = {
+        "case_id": case_id,
+        "fir_number": fir_number.strip(),
+        "crime_type": crime_type.strip() or "Investigation",
+        "case_date": str(case_date),
+        "location_id": "" if location_id == "— None —" else location_id,
+    }
+
+    association_row = {
+        "association_id": _next_association_id(),
+        "case_id": case_id,
+        "person_id": "" if primary_person == "— None —" else primary_person,
+        "relationship": relationship,
+    }
+
+    try:
+        _persist_new_case(case_row, association_row)
+        st.success(f"Case {case_id} created successfully.")
+        st.rerun()
+    except Exception as exc:
+        st.error(f"Could not save the case: {exc}")
+
 
 def render_dashboard():
     st.markdown(
@@ -1362,12 +2486,20 @@ def render_dashboard():
                 unsafe_allow_html=True,
             )
 
+    # Real interactive New Case control.
+    top_left, top_right = st.columns([1, 5])
+    with top_left:
+        if st.button("+ New Case", type="primary", use_container_width=True, key="dashboard_new_case"):
+            st.session_state.show_new_case_form = not st.session_state.get("show_new_case_form", False)
+    if st.session_state.get("show_new_case_form", False):
+        render_new_case_form()
+
     st.markdown(
         """
         <div class="section-card">
             <div class="section-header">
                 <div class="section-title">Recent Cases</div>
-                <div class="new-case">+ New Case</div>
+                <div class="platform-label">Open a case to investigate its primary person</div>
             </div>
         """,
         unsafe_allow_html=True,
@@ -1375,47 +2507,44 @@ def render_dashboard():
 
     headers = ["Case ID", "Title", "Status", "Primary Person", "Score", "Actions"]
     st.markdown(
-        '<div class="case-head">' + "".join(
-            f"<div>{h}</div>" for h in headers
-        ) + "</div>",
+        '<div class="case-head">' + "".join(f"<div>{h}</div>" for h in headers) + "</div>",
         unsafe_allow_html=True,
     )
 
     if cases.empty:
-        st.markdown(
-            '<div class="empty-row">No cases found <a href="#">Create one.</a></div>',
-            unsafe_allow_html=True,
-        )
+        st.markdown('<div class="empty-row">No cases found. Use + New Case to create one.</div>', unsafe_allow_html=True)
     else:
         recent = cases.copy().head(12)
 
-        # Attach a primary person where case associations exist.
         primary = {}
         if {"case_id", "person_id"}.issubset(case_assoc.columns):
             for case_id, grp in case_assoc.groupby("case_id"):
-                if not grp.empty:
-                    primary[str(case_id)] = str(grp.iloc[0]["person_id"])
+                valid = grp[grp["person_id"].notna() & grp["person_id"].astype(str).ne("")]
+                if not valid.empty:
+                    primary[str(case_id)] = str(valid.iloc[0]["person_id"])
 
-        for _, row in recent.iterrows():
+        # Render each row with a real Streamlit View button.
+        for idx, (_, row) in enumerate(recent.iterrows()):
             case_id = str(row.get("case_id", "N/A"))
             title = str(row.get("crime_type", row.get("title", "Investigation")))
             person = primary.get(case_id, "—")
             score = score_for_person(person) if person != "—" else 0
             status = score_range(score) if person != "—" else "OPEN"
 
-            st.markdown(
-                f"""
-                <div class="case-row">
-                    <div>{html.escape(case_id)}</div>
-                    <div>{html.escape(title)}</div>
-                    <div><span class="pill">{html.escape(status)}</span></div>
-                    <div>{html.escape(person)}</div>
-                    <div class="score">{score:.1f}</div>
-                    <div class="action-link">View</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            row_cols = st.columns([1.0, 1.8, 1.0, 1.4, 0.8, 0.8])
+            row_cols[0].write(case_id)
+            row_cols[1].write(title)
+            row_cols[2].markdown(f"`{status}`")
+            row_cols[3].write(person if person != "—" else "Not linked")
+            row_cols[4].write(f"{score:.1f}")
+            with row_cols[5]:
+                if st.button("View", key=f"dashboard_view_case_{case_id}_{idx}", use_container_width=True):
+                    if person != "—" and person in persons:
+                        _open_case_person(person, case_id)
+                    else:
+                        st.session_state.page = "Cases"
+                        st.session_state.selected_case_id = case_id
+                        st.rerun()
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -1428,23 +2557,60 @@ def render_dashboard():
         unsafe_allow_html=True,
     )
 
-# ============================================================
-# CASES
-# ============================================================
 
 def render_cases():
     st.markdown(
         '<div class="page-title-row"><div class="page-title">Cases</div></div>',
         unsafe_allow_html=True,
     )
-    if cases.empty:
-        st.info("No case dataset was found.")
-    else:
-        st.dataframe(cases, use_container_width=True, hide_index=True)
 
-# ============================================================
-# INTELLIGENCE TABLES
-# ============================================================
+    if "selected_case_id" in st.session_state:
+        selected_case_id = str(st.session_state.selected_case_id)
+    else:
+        selected_case_id = ""
+
+    if cases.empty:
+        st.info("No case dataset was found. Use the Dashboard → + New Case button to create a case.")
+        if st.button("Go to Dashboard", key="cases_go_dashboard"):
+            st.session_state.page = "Dashboard"
+            st.rerun()
+        return
+
+    st.caption("Select a case below and open its linked primary person for Individual Investigation.")
+
+    primary = {}
+    relationship_map = {}
+    if {"case_id", "person_id"}.issubset(case_assoc.columns):
+        for case_id, grp in case_assoc.groupby("case_id"):
+            valid = grp[grp["person_id"].notna() & grp["person_id"].astype(str).ne("")]
+            if not valid.empty:
+                primary[str(case_id)] = str(valid.iloc[0]["person_id"])
+                relationship_map[str(case_id)] = str(valid.iloc[0].get("relationship", "Associated"))
+
+    for idx, (_, row) in enumerate(cases.iterrows()):
+        case_id = str(row.get("case_id", "N/A"))
+        title = str(row.get("crime_type", row.get("title", "Investigation")))
+        person = primary.get(case_id, "—")
+        score = score_for_person(person) if person != "—" else 0
+        status = score_range(score) if person != "—" else "OPEN"
+
+        cols = st.columns([1.0, 1.6, 1.0, 1.4, 0.9, 1.0])
+        cols[0].write(case_id)
+        cols[1].write(title)
+        cols[2].markdown(f"`{status}`")
+        cols[3].write(person if person != "—" else "Not linked")
+        cols[4].write(f"{score:.1f}")
+        with cols[5]:
+            if person != "—" and person in persons:
+                if st.button("View", key=f"cases_view_{case_id}_{idx}", use_container_width=True):
+                    _open_case_person(person, case_id)
+            else:
+                if st.button("View Case", key=f"cases_view_only_{case_id}_{idx}", use_container_width=True):
+                    st.session_state.selected_case_id = case_id
+                    st.info(f"Case {case_id} has no linked primary person. Add an association in the case data to open Individual Investigation.")
+
+    st.markdown("### Case Register")
+    st.dataframe(cases, use_container_width=True, hide_index=True)
 
 def render_table_page(title, df):
     st.markdown(
@@ -1456,37 +2622,67 @@ def render_table_page(title, df):
     else:
         st.dataframe(df, use_container_width=True, hide_index=True)
 
-# ============================================================
-# NETWORK EXPLORER
-# ============================================================
+def render_network_graph_visual(selected=None):
+    # Kept as a compatibility wrapper for existing calls.
+    if len(persons) < 2:
+        st.info("At least two person IDs are required for the investigation network.")
+        return
+    a = selected if selected in persons else persons[0]
+    b = next((p for p in persons if p != a), persons[1])
+    return render_person_to_person_network(a, b)
+
 
 def render_network():
+    """Network Explorer: focused person-to-person investigation network."""
     st.markdown(
         '<div class="page-title-row"><div class="page-title">Network Explorer</div></div>',
         unsafe_allow_html=True,
     )
 
-    if G.number_of_nodes() == 0:
-        st.info("No GraphML network is available.")
+    if len(persons) < 2:
+        st.info("At least two person records are required for Network Explorer.")
         return
 
-    st.metric("Network Nodes", G.number_of_nodes())
-    st.metric("Network Edges", G.number_of_edges())
+    # The graph is deliberately controlled by two people, matching the supplied
+    # reference instead of rendering the dense all-person GraphML view.
+    c1, c2 = st.columns(2)
+    with c1:
+        a = st.selectbox(
+            "Person A",
+            persons,
+            format_func=lambda p: f"{p} — {_person_display_name(p)}",
+            key="network_person_a",
+        )
+    with c2:
+        b_options = [p for p in persons if p != a] or persons
+        default_b = st.session_state.get("network_person_b")
+        if default_b not in b_options:
+            default_b = b_options[0]
+        b = st.selectbox(
+            "Person B",
+            b_options,
+            index=b_options.index(default_b),
+            format_func=lambda p: f"{p} — {_person_display_name(p)}",
+            key="network_person_b",
+        )
 
-    nodes = list(G.nodes())
-    selected = st.selectbox("Focus node", nodes)
+    H = render_person_to_person_network(a, b)
 
-    neighbors = list(G.neighbors(selected))
-    st.write(f"Connections for **{selected}**: {len(neighbors)}")
+    st.markdown("### Network Summary")
+    summary_cols = st.columns(4)
+    summary_cols[0].metric("Selected Persons", 2)
+    summary_cols[1].metric("Visible Nodes", H.number_of_nodes())
+    summary_cols[2].metric("Relationships", H.number_of_edges())
+    summary_cols[3].metric("Network Degree", f"{H.degree(a) + H.degree(b)}")
 
-    if neighbors:
-        rows = []
-        for n in neighbors:
-            rows.append({
-                "Node": str(n),
-                "Relationship": str(G.edges[selected, n].get("relationship", "Relationship")),
-            })
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+    st.markdown("### Network Centrality Indicators")
+    centrality = nx.degree_centrality(G) if G.number_of_nodes() else {}
+    top = sorted(centrality.items(), key=lambda x: x[1], reverse=True)[:15]
+    if top:
+        st.bar_chart(pd.DataFrame(top, columns=["Person", "Centrality"]).set_index("Person"), height=300)
+    else:
+        st.info("No GraphML centrality data is available.")
+
 
 # ============================================================
 # RELATIONSHIP ANALYSIS
@@ -1675,6 +2871,74 @@ def render_evidence():
             else:
                 st.dataframe(df, use_container_width=True, hide_index=True)
 
+    render_biometric_intelligence()
+
+# ============================================================
+# AI INTELLIGENCE REPORTS
+# ============================================================
+
+def render_reports_ai():
+    st.markdown('<div class="page-title-row"><div class="page-title">Reports</div></div>', unsafe_allow_html=True)
+    st.markdown("### AI Intelligence Report Generator")
+    focus = st.text_input("Report focus", value="overall criminal network and cross-source evidence")
+    if st.button("Generate Intelligence Report", type="primary"):
+        with st.spinner("Generating intelligence report..."):
+            report, source = generate_intelligence_report(focus)
+        st.success(source)
+        st.text_area("Generated report", report, height=420)
+        st.download_button("Download report", report, file_name="crimesphere_intelligence_report.txt", mime="text/plain")
+    st.markdown("### Current Analytical Coverage")
+    st.json(build_llm_report_context())
+
+# ============================================================
+# ADMIN — USER MANAGEMENT
+# ============================================================
+
+def render_admin_user_management():
+    if st.session_state.get("role") != "Admin":
+        st.error("Administrator access required.")
+        return
+    st.markdown("### User & Access Management")
+    st.caption("Category A administrators can create and deactivate Category B accounts and change account roles.")
+    users = load_users()
+    rows = []
+    for uname, rec in users.items():
+        rows.append({"Username": uname, "Category": ROLE_CATEGORY.get(rec.get("role"), ""), "Role": rec.get("role", ""), "Active": bool(rec.get("active", True))})
+    if rows:
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+    with st.expander("Create / update user", expanded=False):
+        with st.form("admin_user_form"):
+            uname = st.text_input("Username").strip().lower()
+            new_password = st.text_input("Password", type="password")
+            role = st.selectbox("Role", ["Admin", "Police", "Investigator"])
+            active = st.checkbox("Account active", value=True)
+            save = st.form_submit_button("Save user", type="primary")
+        if save:
+            if not re.fullmatch(r"[a-zA-Z0-9._-]{3,40}", uname):
+                st.error("Username must be 3–40 characters and use only letters, numbers, dot, underscore or hyphen.")
+            elif len(new_password) < 8:
+                st.error("Password must contain at least 8 characters.")
+            else:
+                users[uname] = {"password_hash": _password_hash(new_password), "role": role, "active": active}
+                save_users(users)
+                st.success(f"User '{uname}' saved as {ROLE_LABEL[role]}.")
+                st.rerun()
+
+    with st.expander("Deactivate / reactivate account", expanded=False):
+        candidates = [u for u in users if u != st.session_state.get("username")]
+        if candidates:
+            target = st.selectbox("Account", candidates, key="admin_target_user")
+            current = users[target]
+            if st.button("Toggle active status", key="admin_toggle_user"):
+                current["active"] = not bool(current.get("active", True))
+                save_users(users)
+                st.success(f"{target} is now {'active' if current['active'] else 'inactive'}.")
+                st.rerun()
+        else:
+            st.info("No other accounts are available to manage.")
+
+
 # ============================================================
 # SETTINGS
 # ============================================================
@@ -1684,6 +2948,10 @@ def render_settings():
         '<div class="page-title-row"><div class="page-title">Settings</div></div>',
         unsafe_allow_html=True,
     )
+
+    if st.session_state.get("role") == "Admin":
+        render_admin_user_management()
+        st.divider()
 
     st.markdown("### Project Features")
 
@@ -1845,6 +3113,228 @@ def render_settings():
 # INDIVIDUAL INVESTIGATION
 # ============================================================
 
+
+def build_individual_investigation_network(person_id, max_per_type=10, max_connected_people=10):
+    """Build a focused ego/investigation network for one selected person."""
+    pid = str(person_id)
+    H = nx.Graph()
+    _add_node(H, pid, "person", _person_display_name(pid))
+
+    def add_relation(u, v, relation):
+        if str(u) == str(v):
+            return
+        H.add_edge(str(u), str(v), relationship=relation)
+
+    connected_people = {}
+    if {"caller_person_id", "receiver_person_id"}.issubset(cdr.columns):
+        for _, r in cdr.iterrows():
+            caller = str(r.get("caller_person_id", ""))
+            receiver = str(r.get("receiver_person_id", ""))
+            if caller == pid and receiver and receiver != pid:
+                connected_people[receiver] = connected_people.get(receiver, 0) + 1
+            elif receiver == pid and caller and caller != pid:
+                connected_people[caller] = connected_people.get(caller, 0) + 1
+
+    if {"sender_person_id", "receiver_person_id"}.issubset(transactions.columns):
+        for _, r in transactions.iterrows():
+            sender = str(r.get("sender_person_id", ""))
+            receiver = str(r.get("receiver_person_id", ""))
+            if sender == pid and receiver and receiver != pid:
+                connected_people[receiver] = connected_people.get(receiver, 0) + 1
+            elif receiver == pid and sender and sender != pid:
+                connected_people[sender] = connected_people.get(sender, 0) + 1
+
+    if pid in G:
+        for n in G.neighbors(pid):
+            n = str(n)
+            if n in persons and n != pid:
+                connected_people[n] = connected_people.get(n, 0) + 1
+
+    for other, count in sorted(connected_people.items(), key=lambda x: (-x[1], x[0]))[:max_connected_people]:
+        _add_node(H, other, "person", _person_display_name(other))
+        add_relation(pid, other, f"PERSON CONNECTION · {count}")
+
+    if {"phone_id", "person_id"}.issubset(phones.columns):
+        rows = phones[phones["person_id"].astype(str).eq(pid)].head(max_per_type)
+        for _, r in rows.iterrows():
+            phone_id = str(r["phone_id"])
+            nid = f"PH:{phone_id}"
+            _add_node(H, nid, "phone", str(r.get("phone_number", phone_id)))
+            add_relation(pid, nid, "PHONE")
+
+    vehicle_ids = []
+    if {"vehicle_id", "owner_person_id"}.issubset(vehicles.columns):
+        vehicle_ids.extend(vehicles.loc[vehicles["owner_person_id"].astype(str).eq(pid), "vehicle_id"].astype(str).tolist())
+    if {"vehicle_id", "person_id"}.issubset(vehicle_events.columns):
+        vehicle_ids.extend(vehicle_events.loc[vehicle_events["person_id"].astype(str).eq(pid), "vehicle_id"].astype(str).tolist())
+    for vehicle_id in list(dict.fromkeys(vehicle_ids))[:max_per_type]:
+        nid = f"VEH:{vehicle_id}"
+        _add_node(H, nid, "vehicle", _entity_label("vehicle", vehicle_id))
+        add_relation(pid, nid, "VEHICLE")
+
+    if {"account_id", "person_id"}.issubset(bank_accounts.columns):
+        rows = bank_accounts[bank_accounts["person_id"].astype(str).eq(pid)].head(max_per_type)
+        for _, r in rows.iterrows():
+            account_id = str(r["account_id"])
+            nid = f"BA:{account_id}"
+            _add_node(H, nid, "bank_account", _entity_label("bank_account", account_id))
+            add_relation(pid, nid, "BANK ACCOUNT")
+
+    if {"device_id", "person_id"}.issubset(devices.columns):
+        rows = devices[devices["person_id"].astype(str).eq(pid)].head(max_per_type)
+        for _, r in rows.iterrows():
+            device_id = str(r["device_id"])
+            nid = f"DEV:{device_id}"
+            _add_node(H, nid, "device", _entity_label("device", device_id))
+            add_relation(pid, nid, "DEVICE")
+
+    location_ids = []
+    if {"person_id", "location_id"}.issubset(locations.columns):
+        location_ids.extend(locations.loc[locations["person_id"].astype(str).eq(pid), "location_id"].astype(str).tolist())
+    if {"person_id", "location_id"}.issubset(surveillance.columns):
+        location_ids.extend(surveillance.loc[surveillance["person_id"].astype(str).eq(pid), "location_id"].astype(str).tolist())
+    for location_id in list(dict.fromkeys(location_ids))[:max_per_type]:
+        nid = f"LOC:{location_id}"
+        _add_node(H, nid, "location", _entity_label("location", location_id))
+        add_relation(pid, nid, "LOCATION")
+
+    if {"person_id", "case_id"}.issubset(case_assoc.columns):
+        rows = case_assoc[case_assoc["person_id"].astype(str).eq(pid)].head(max_per_type)
+        for _, r in rows.iterrows():
+            case_id = str(r["case_id"])
+            nid = f"CASE:{case_id}"
+            _add_node(H, nid, "case", _entity_label("case", case_id))
+            add_relation(pid, nid, "CASE")
+
+    if "person_id" in forensic.columns:
+        rows = forensic[forensic["person_id"].astype(str).eq(pid)].head(max_per_type)
+        evidence_id_col = next((c for c in ["report_id", "fingerprint_id", "evidence_id"] if c in rows.columns), None)
+        if evidence_id_col:
+            for _, r in rows.iterrows():
+                evidence_id = str(r[evidence_id_col])
+                nid = f"EVD:{evidence_id}"
+                _add_node(H, nid, "evidence", evidence_id)
+                add_relation(pid, nid, "EVIDENCE")
+
+    if pid in G:
+        for n in G.neighbors(pid):
+            attrs = G.nodes[n]
+            raw_type = str(attrs.get("type", attrs.get("node_type", attrs.get("entity_type", "")))).lower()
+            if raw_type in {"organization", "org", "company"}:
+                nid = f"ORG:{n}"
+                _add_node(H, nid, "organization", str(attrs.get("name", n)))
+                add_relation(pid, nid, "ORGANIZATION")
+
+    return H
+
+
+def render_individual_investigation_network(person_id):
+    """Render the selected person's investigation network with the requested icons."""
+    H = build_individual_investigation_network(person_id)
+    if H.number_of_nodes() <= 1:
+        st.info("No connected investigation records are available for this person.")
+        return H
+
+    st.markdown("### Individual Investigation Network")
+    st.caption(f"{_person_display_name(person_id)} · Focused multi-source investigation view")
+
+    ICONS = {
+        "person": "👤", "phone": "☎", "vehicle": "🚗", "bank_account": "🏦",
+        "organization": "🏢", "location": "📍", "case": "📁", "device": "💻", "evidence": "E",
+    }
+    COLORS = {
+        "person": "#2B78B5", "phone": "#4B82C4", "vehicle": "#4E9B51", "bank_account": "#D18A2B",
+        "organization": "#8B5FA7", "location": "#C96D43", "case": "#B35B7C", "device": "#3E8F8F", "evidence": "#7C6A50",
+    }
+
+    center = str(person_id)
+    people = [n for n in H.nodes if H.nodes[n].get("node_type") == "person" and n != center]
+    entities = [n for n in H.nodes if n != center and n not in people]
+
+    W, HGT = 1180, 720
+    cx, cy = 470, 355
+    positions = {center: (cx, cy)}
+
+    if people:
+        rx, ry = 190, 145
+        for i, n in enumerate(people):
+            angle = (2 * np.pi * i / len(people)) - np.pi / 2
+            positions[n] = (cx + rx * np.cos(angle), cy + ry * np.sin(angle))
+
+    rings = [[], []]
+    for i, n in enumerate(entities):
+        rings[min(i // 16, 1)].append(n)
+    for ring_idx, nodes in enumerate(rings):
+        if not nodes:
+            continue
+        rx, ry = ((330, 235), (445, 305))[ring_idx]
+        count = len(nodes)
+        for j, n in enumerate(nodes):
+            angle = (2 * np.pi * j / count) - np.pi / 2 + (0.07 * ring_idx)
+            positions[n] = (cx + rx * np.cos(angle), cy + ry * np.sin(angle))
+
+    def esc(value):
+        return html.escape(str(value), quote=True)
+
+    svg = [f"""<div style=\"width:100%;background:#fff;border:1px solid #e2e5e8;border-radius:12px;overflow:hidden;\">
+    <svg viewBox=\"0 0 {W} {HGT}\" width=\"100%\" role=\"img\" aria-label=\"Individual investigation network\" style=\"display:block;background:#fff;font-family:Segoe UI,Arial,sans-serif;\">
+      <defs><filter id=\"individualShadow\" x=\"-30%\" y=\"-30%\" width=\"160%\" height=\"160%\"><feDropShadow dx=\"0\" dy=\"2\" stdDeviation=\"3\" flood-opacity=\"0.16\"/></filter></defs>
+      <text x=\"590\" y=\"34\" text-anchor=\"middle\" font-size=\"23\" font-weight=\"700\" fill=\"#25313A\">Individual Investigation Network</text>
+      <text x=\"590\" y=\"55\" text-anchor=\"middle\" font-size=\"11\" fill=\"#7A858D\">{esc(_person_display_name(center))} · Multi-source evidence map</text>
+      <rect x=\"18\" y=\"75\" width=\"1144\" height=\"610\" rx=\"10\" fill=\"#FFFFFF\"/>"""]
+
+    edge_colors = {
+        "PHONE": "#6B8FD3", "VEHICLE": "#6FA56F", "BANK ACCOUNT": "#D5A15A", "DEVICE": "#69A6A6",
+        "LOCATION": "#D28A67", "CASE": "#BF7894", "EVIDENCE": "#9C8A70", "ORGANIZATION": "#9873AD",
+        "PERSON CONNECTION": "#4F78A8",
+    }
+
+    for u, v, data in H.edges(data=True):
+        if u not in positions or v not in positions:
+            continue
+        x1, y1 = positions[u]; x2, y2 = positions[v]
+        rel = str(data.get("relationship", "RELATED"))
+        base = rel.split(" · ")[0]
+        edge_color = edge_colors.get(base, "#A5A9AD")
+        direct_person = H.nodes[u].get("node_type") == "person" and H.nodes[v].get("node_type") == "person"
+        width = 3.0 if direct_person else 1.25
+        opacity = 0.78 if direct_person else 0.43
+        svg.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{edge_color}" stroke-width="{width}" opacity="{opacity}"/>')
+
+    for node in H.nodes:
+        typ = str(H.nodes[node].get("node_type", "evidence"))
+        x, y = positions[node]
+        is_center = node == center
+        is_person = typ == "person"
+        r = 34 if is_center else (25 if is_person else 21)
+        stroke = COLORS.get(typ, "#7C6A50")
+        fill = "#EAF3FB" if is_center else "#FFFFFF"
+        icon = ICONS.get(typ, "E")
+        label = str(H.nodes[node].get("display_label", node))
+        if len(label) > 27:
+            label = label[:24] + "…"
+        icon_size = 27 if is_center else (22 if is_person else 19)
+        label_y = y + r + 16
+        svg.append('<g filter="url(#individualShadow)">')
+        svg.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r}" fill="{fill}" stroke="{stroke}" stroke-width="2.5"/>')
+        svg.append(f'<text x="{x:.1f}" y="{y + icon_size * 0.34:.1f}" text-anchor="middle" font-size="{icon_size}px" font-weight="700" fill="{stroke}">{esc(icon)}</text>')
+        svg.append('</g>')
+        svg.append(f'<text x="{x:.1f}" y="{label_y:.1f}" text-anchor="middle" font-size="{10 if is_center else 8}px" font-weight="{700 if is_center or is_person else 400}" fill="#343A40">{esc(label)}</text>')
+
+    lx, ly = 965, 115
+    svg.append(f'<text x="{lx}" y="{ly}" font-size="13" font-weight="700" fill="#34414A">Node Legend</text>')
+    legend = [("person", "Person"), ("phone", "Phone"), ("vehicle", "Vehicle"), ("bank_account", "Bank Account"), ("organization", "Organization"), ("location", "Location"), ("case", "Case"), ("device", "Device"), ("evidence", "Evidence")]
+    for i, (typ, name) in enumerate(legend):
+        yy = ly + 26 + i * 30
+        svg.append(f'<circle cx="{lx + 9}" cy="{yy}" r="10" fill="#fff" stroke="{COLORS[typ]}" stroke-width="1.9"/>')
+        svg.append(f'<text x="{lx + 9}" y="{yy + 3.7}" text-anchor="middle" font-size="11">{esc(ICONS[typ])}</text>')
+        svg.append(f'<text x="{lx + 28}" y="{yy + 4}" font-size="10" fill="#56616A">{esc(name)}</text>')
+
+    svg.append(f'<text x="590" y="670" text-anchor="middle" font-size="9.5" fill="#7A838A">Visible nodes: {H.number_of_nodes()}  •  Relationships: {H.number_of_edges()}  •  Connected persons: {len(people)}</text>')
+    svg.append('</svg></div>')
+    components.html("".join(svg), height=745, scrolling=False)
+    return H
+
 def render_individual_investigation():
     st.markdown(
         '<div class="page-title-row"><div class="page-title">Individual Investigation</div></div>',
@@ -1904,6 +3394,11 @@ def render_individual_investigation():
     cols[2].metric("Screening Assessment", "YES" if score > 0 else "NO")
     cols[3].metric("Connected Persons", len(connected))
 
+    render_xai_panel(selected)
+
+    # Focused visual network for the selected person.
+    render_individual_investigation_network(selected)
+
     st.markdown("### EVIDENCE ANALYSIS")
 
     evidence_blocks = [
@@ -1941,6 +3436,10 @@ def render_individual_investigation():
 # ============================================================
 
 page = st.session_state.page
+allowed_pages = set(ROLE_PAGES.get(st.session_state.get("role", "Police"), ROLE_PAGES["Police"]))
+if page not in allowed_pages:
+    st.session_state.page = "Dashboard"
+    page = "Dashboard"
 
 if page == "Dashboard":
     render_dashboard()
@@ -1957,7 +3456,7 @@ elif page == "CDR Intelligence":
 elif page == "Transactions":
     render_table_page("Transactions", transactions)
 elif page == "Surveillance":
-    render_table_page("Surveillance", locations)
+    render_geospatial_intelligence()
 elif page == "Network Explorer":
     render_network()
 elif page == "Relationships":
@@ -1967,7 +3466,7 @@ elif page == "Timeline":
 elif page == "Evidence":
     render_evidence()
 elif page == "Reports":
-    render_table_page("Reports", assessment)
+    render_reports_ai()
 elif page == "Settings":
     render_settings()
 else:
