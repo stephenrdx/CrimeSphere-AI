@@ -12,7 +12,13 @@ import re
 from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
-
+import textwrap
+import base64
+import hmac
+import secrets
+import time
+import sqlite3
+from urllib.parse import quote
 
 # ============================================================
 # CAPACITY / CRIMINAL NETWORK ANALYSIS — CRIMESPHERE UI
@@ -74,19 +80,19 @@ ROLE_PAGES = {
         ("MAIN", [("", "Dashboard"), ("", "Cases")]),
         ("INTELLIGENCE", [("", "FIR Intelligence"), ("", "Historical Cases"), ("", "CDR Intelligence"), ("", "Transactions"), ("", "Surveillance")]),
         ("ANALYSIS", [("", "Individual Investigation"), ("", "Network Explorer"), ("", "Relationships"), ("", "Timeline"), ("", "Evidence")]),
-        ("SYSTEM", [("", "Reports"), ("", "Settings")]),
+        ("SYSTEM", [("", "Reports"), ("", "Complaint Box"), ("", "Settings")]),
     ] for _, label in items],
     "Police": [
         "Dashboard", "Cases", "FIR Intelligence", "Historical Cases",
         "CDR Intelligence", "Transactions", "Surveillance",
         "Individual Investigation", "Network Explorer", "Relationships",
-        "Timeline", "Evidence", "Reports"
+        "Timeline", "Evidence", "Reports", "Help & Support"
     ],
     "Investigator": [
         "Dashboard", "Cases", "FIR Intelligence", "Historical Cases",
         "CDR Intelligence", "Transactions", "Surveillance",
         "Individual Investigation", "Network Explorer", "Relationships",
-        "Timeline", "Evidence", "Reports"
+        "Timeline", "Evidence", "Reports", "Help & Support"
     ],
 }
 
@@ -100,11 +106,73 @@ ROLE_LABEL = {
 def _password_hash(password):
     return hashlib.sha256(str(password).encode("utf-8")).hexdigest()
 
+def _auth_secret():
+    """Return a persistent local signing secret for browser session tokens."""
+    secret_file = PROCESSED_DIR / ".auth_secret"
+    secret_file.parent.mkdir(parents=True, exist_ok=True)
+    if secret_file.exists():
+        value = secret_file.read_text(encoding="utf-8").strip()
+        if value:
+            return value.encode("utf-8")
+    value = secrets.token_urlsafe(48)
+    secret_file.write_text(value, encoding="utf-8")
+    return value.encode("utf-8")
+
+def _make_auth_token(username, role, password_hash, ttl_seconds=12 * 60 * 60):
+    payload = {
+        "u": username,
+        "r": role,
+        "p": password_hash,
+        "iat": int(time.time()),
+        "exp": int(time.time()) + ttl_seconds,
+    }
+    raw = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    body = base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+    sig = hmac.new(_auth_secret(), body.encode("ascii"), hashlib.sha256).hexdigest()
+    return f"{body}.{sig}"
+
+def _restore_auth_from_token(token):
+    """Restore authentication after a browser navigation/reconnect."""
+    if not token or "." not in token:
+        return False
+    try:
+        body, signature = token.rsplit(".", 1)
+        expected = hmac.new(_auth_secret(), body.encode("ascii"), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(signature, expected):
+            return False
+        padded = body + "=" * (-len(body) % 4)
+        payload = json.loads(base64.urlsafe_b64decode(padded.encode("ascii")).decode("utf-8"))
+        if int(payload.get("exp", 0)) < int(time.time()):
+            return False
+        username = str(payload.get("u", "")).strip().lower()
+        role = str(payload.get("r", ""))
+        users = load_users()
+        record = users.get(username)
+        if not record or not record.get("active", True):
+            return False
+        if record.get("role") != role or record.get("password_hash") != payload.get("p"):
+            return False
+        if role not in ROLE_PAGES:
+            return False
+        st.session_state.authenticated = True
+        st.session_state.username = username
+        st.session_state.role = role
+        st.session_state.category = ROLE_CATEGORY[role]
+        st.session_state.auth_token = token
+        return True
+    except Exception:
+        return False
+
 def _default_users():
+    # Official CrimeSphere demo accounts. Passwords are stored as SHA-256 hashes,
+    # not in plaintext. These replace all previous/legacy login accounts.
     return {
-        "admin": {"password_hash": _password_hash("Admin@123"), "role": "Admin", "active": True},
-        "police": {"password_hash": _password_hash("Police@123"), "role": "Police", "active": True},
-        "investigator": {"password_hash": _password_hash("Investigator@123"), "role": "Investigator", "active": True},
+        "kavya": {"user_id": "USR-KAVYA", "full_name": "Kavya", "email": "kavya@crimesphere.ai", "password_hash": _password_hash("Kavya@0512"), "role": "Admin", "active": True, "built_in": True},
+        "stephen": {"user_id": "USR-STEPHEN", "full_name": "Stephen", "email": "stephen@crimesphere.ai", "password_hash": _password_hash("Stephen@0512"), "role": "Admin", "active": True, "built_in": True},
+        "suhaib": {"user_id": "USR-SUHAIB", "full_name": "Suhaib", "email": "suhaib@crimesphere.ai", "password_hash": _password_hash("Suhaib@2026"), "role": "Police", "active": True, "built_in": True},
+        "sameera": {"user_id": "USR-SAMEERA", "full_name": "Sameera", "email": "sameera@crimesphere.ai", "password_hash": _password_hash("Sameera@2026"), "role": "Police", "active": True, "built_in": True},
+        "lavanya": {"user_id": "USR-LAVANYA", "full_name": "Lavanya", "email": "lavanya@crimesphere.ai", "password_hash": _password_hash("Lavanya@2026"), "role": "Investigator", "active": True, "built_in": True},
+        "vasu": {"user_id": "USR-VASU", "full_name": "Vasu", "email": "vasu@crimesphere.ai", "password_hash": _password_hash("Vasu@2026"), "role": "Investigator", "active": True, "built_in": True},
     }
 
 def load_users():
@@ -124,11 +192,15 @@ def save_users(users):
     USERS_FILE.write_text(json.dumps(users, indent=2), encoding="utf-8")
 
 def _logout():
-    for key in ["authenticated", "username", "role", "category", "page", "selected_case_id", "individual_investigation_select"]:
+    for key in list(st.session_state.keys()):
         st.session_state.pop(key, None)
     st.session_state.authenticated = False
+    try:
+        st.query_params.clear()
+    except Exception:
+        pass
     st.rerun()
-
+    
 def render_login():
     st.markdown("""
     <style>
@@ -159,11 +231,17 @@ def render_login():
             if role not in ROLE_PAGES:
                 st.error("Account has an invalid role. Contact an administrator.")
                 return
+            clean_username = username.strip().lower()
             st.session_state.authenticated = True
-            st.session_state.username = username.strip().lower()
+            st.session_state.username = clean_username
             st.session_state.role = role
             st.session_state.category = ROLE_CATEGORY[role]
             st.session_state.page = "Dashboard"
+            st.session_state.auth_token = _make_auth_token(clean_username, role, record.get("password_hash", ""))
+            # Keep authentication in the same browser tab. This token is only
+            # used to restore the Streamlit session after a navigation/reconnect.
+            st.query_params["auth"] = st.session_state.auth_token
+            st.query_params["page"] = "Dashboard"
             st.rerun()
         else:
             st.error("Invalid username/password or inactive account.")
@@ -171,6 +249,14 @@ def render_login():
     st.caption("For the first local run, demo accounts are created automatically. Change their passwords before deployment.")
 
 # Authenticate before loading the investigation workspace.
+# If the browser reconnects after clicking a module, restore the same logged-in
+# user from the signed token instead of showing the login page again.
+if not st.session_state.get("authenticated", False):
+    try:
+        _restore_auth_from_token(st.query_params.get("auth"))
+    except Exception:
+        pass
+
 if not st.session_state.get("authenticated", False):
     render_login()
     st.stop()
@@ -1141,6 +1227,41 @@ div[data-testid="column"] button[kind="secondary"]:hover {{
 )
 
 # ============================================================
+# CASE / DATA-SOURCE UI ENHANCEMENTS
+# ============================================================
+st.markdown("""
+<style>
+.data-source-card {
+    min-height: 64px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid transparent;
+    font-size: 15px;
+}
+.data-source-card span { font-weight: 500; }
+.data-source-card small { margin-top: 3px; font-size: 11px; opacity: .78; }
+.data-source-ok { background: #dff0df; border-color: #c8e4c8; color: #087f43; }
+.data-source-warning { background: #f9dddd; border-color: #e7b8b8; color: #a32232; }
+.data-source-empty { background: #f1f1ef; border-color: #dedbd4; color: #777; }
+.case-detail-card {
+    background: #f8f7f3;
+    border: 1px solid #dedbd4;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    min-height: 70px;
+}
+.case-detail-label { font-size: 11px; color: #727b83; text-transform: uppercase; letter-spacing: .6px; }
+.case-detail-value { margin-top: 7px; font-size: 16px; color: #20384c; font-weight: 600; word-break: break-word; }
+</style>
+""", unsafe_allow_html=True)
+
+# ============================================================
 # DATA LOADING
 # ============================================================
 
@@ -1210,9 +1331,10 @@ organizations = clean_id_columns(organizations)
 
 # ============================================================
 # DERIVED METRICS
-# ============================================================
-
-def person_ids():
+# These values are expensive to calculate, so cache them between
+# Streamlit reruns (module/sidebar clicks).
+@st.cache_data(show_spinner=False)
+def build_derived_metrics():
     ids = set()
 
     if "person_id" in assessment.columns:
@@ -1237,74 +1359,68 @@ def person_ids():
             if col in df.columns:
                 ids.update(df[col].dropna().astype(str))
 
-    # Graph fallback
     for node, attrs in G.nodes(data=True):
-        node_type = str(
-            attrs.get("type", attrs.get("node_type", attrs.get("entity_type", "")))
-        ).lower()
+        node_type = str(attrs.get("type", attrs.get("node_type", attrs.get("entity_type", "")))).lower()
         if node_type in {"person", "criminal"} or str(node).startswith("P"):
             ids.add(str(node))
 
-    return sorted(x for x in ids if x and x.lower() != "nan")
-
-persons = person_ids()
-
-def unique_count(df, columns):
-    for col in columns:
-        if col in df.columns:
-            return int(df[col].dropna().astype(str).nunique())
-    return 0
-
-criminal_pairs = set()
-
-def add_direct_pairs(df, a_col, b_col):
-    if df.empty or a_col not in df.columns or b_col not in df.columns:
-        return
+    persons = sorted(x for x in ids if x and x.lower() != "nan")
     valid = set(persons)
-    for _, row in df[[a_col, b_col]].dropna().iterrows():
-        a, b = str(row[a_col]), str(row[b_col])
-        if a != b and a in valid and b in valid:
-            criminal_pairs.add(tuple(sorted((a, b))))
+    criminal_pairs = set()
 
-add_direct_pairs(cdr, "caller_person_id", "receiver_person_id")
-add_direct_pairs(transactions, "sender_person_id", "receiver_person_id")
+    def add_direct_pairs(df, a_col, b_col):
+        if df.empty or a_col not in df.columns or b_col not in df.columns:
+            return
+        for _, row in df[[a_col, b_col]].dropna().iterrows():
+            a, b = str(row[a_col]), str(row[b_col])
+            if a != b and a in valid and b in valid:
+                criminal_pairs.add(tuple(sorted((a, b))))
 
-if {"person_id", "location_id"}.issubset(locations.columns):
-    for _, group in locations.groupby("location_id"):
-        people = sorted(set(group["person_id"].astype(str)) & set(persons))
-        criminal_pairs.update(combinations(people, 2))
+    add_direct_pairs(cdr, "caller_person_id", "receiver_person_id")
+    add_direct_pairs(transactions, "sender_person_id", "receiver_person_id")
 
-if {"person_id", "case_id"}.issubset(case_assoc.columns):
-    for _, group in case_assoc.groupby("case_id"):
-        people = sorted(set(group["person_id"].astype(str)) & set(persons))
-        criminal_pairs.update(combinations(people, 2))
+    if {"person_id", "location_id"}.issubset(locations.columns):
+        for _, group in locations.groupby("location_id"):
+            people = sorted(set(group["person_id"].astype(str)) & valid)
+            criminal_pairs.update(combinations(people, 2))
 
+    if {"person_id", "case_id"}.issubset(case_assoc.columns):
+        for _, group in case_assoc.groupby("case_id"):
+            people = sorted(set(group["person_id"].astype(str)) & valid)
+            criminal_pairs.update(combinations(people, 2))
+
+    case_ids = set()
+    for df in [cases, case_assoc, forensic]:
+        if "case_id" in df.columns:
+            case_ids.update(df["case_id"].dropna().astype(str))
+
+    high_relevance = 0
+    if not assessment.empty and "person_id" in assessment.columns:
+        score_col = next((c for c in ["investigative_score", "score", "overall_score"] if c in assessment.columns), None)
+        if score_col:
+            high_relevance = int(pd.to_numeric(assessment[score_col], errors="coerce").fillna(0).ge(61).sum())
+
+    return {
+        "persons": persons,
+        "criminal_relationships": len(criminal_pairs),
+        "total_cases": len(case_ids),
+        "graph_relationships": int(G.number_of_edges()),
+        "total_relationships": int(G.number_of_edges()) + len(criminal_pairs),
+        "high_relevance": high_relevance,
+        "key_network_nodes": int(G.number_of_nodes()),
+    }
+
+_metrics = build_derived_metrics()
+persons = _metrics["persons"]
+criminal_pairs = set()  # kept for compatibility with existing page code
 total_criminals = len(persons)
+total_cases = _metrics["total_cases"]
+graph_relationships = _metrics["graph_relationships"]
+criminal_relationships = _metrics["criminal_relationships"]
+total_relationships = _metrics["total_relationships"]
+high_relevance = _metrics["high_relevance"]
+key_network_nodes = _metrics["key_network_nodes"]
 
-case_ids = set()
-for df in [cases, case_assoc, forensic]:
-    if "case_id" in df.columns:
-        case_ids.update(df["case_id"].dropna().astype(str))
-total_cases = len(case_ids)
-
-graph_relationships = int(G.number_of_edges())
-criminal_relationships = len(criminal_pairs)
-total_relationships = graph_relationships + criminal_relationships
-
-high_relevance = 0
-if not assessment.empty and "person_id" in assessment.columns:
-    score_col = next(
-        (c for c in ["investigative_score", "score", "overall_score"] if c in assessment.columns),
-        None,
-    )
-    if score_col:
-        high_relevance = int(
-            pd.to_numeric(assessment[score_col], errors="coerce").fillna(0).ge(61).sum()
-        )
-
-key_network_nodes = int(G.number_of_nodes())
-
-# ============================================================
 # PERMANENT LEFT SIDEBAR
 # ============================================================
 
@@ -1330,8 +1446,10 @@ NAV = [
         ("▦", "Timeline"),
         ("🔬", "Evidence"),
     ]),
-    ("SYSTEM", [
+    ("SUPPORT", [
+        ("🆘", "Help & Support"),
         ("📊", "Reports"),
+        ("📥", "Complaint Box"),
         ("⚙", "Settings"),
     ]),
 ]
@@ -1344,7 +1462,10 @@ NAV = [
 NAV = [(section, items) for section, items in NAV if items]
 valid_pages = [label for _, items in NAV for _, label in items]
 
-# Allow the HTML navigation links to control the Streamlit page.
+# Navigation is kept in the same Streamlit session.
+# The sidebar links use the current tab (target=_self) and only update the
+# page query parameter; no new tab/window is opened.  Authentication remains
+# in session_state, so module navigation does not show the login screen again.
 try:
     requested_page = st.query_params.get("page")
 except Exception:
@@ -1355,13 +1476,43 @@ if requested_page in valid_pages:
 elif st.session_state.get("page") not in valid_pages:
     st.session_state.page = "Dashboard"
 
+# Preserve the signed login token on every module link.
+auth_token = st.session_state.get("auth_token") or st.query_params.get("auth") or ""
+
 # Visible identity / logout control.
-identity_left, identity_right = st.columns([7, 1])
-with identity_left:
-    st.caption(f"Signed in as **{st.session_state.get('username', '')}** · {ROLE_LABEL.get(st.session_state.get('role', ''), '')}")
-with identity_right:
-    if st.button("Logout", key="top_logout", use_container_width=True):
-        _logout()
+# ============================================================
+# TOP-RIGHT CLICKABLE USER PROFILE WITH AVATAR
+# ============================================================
+
+current_username = st.session_state.get("username", "User")
+current_role = st.session_state.get("role", "Police")
+current_role_label = ROLE_LABEL.get(current_role, current_role)
+
+profile_initial = current_username[:1].upper() if current_username else "U"
+
+profile_spacer, profile_col = st.columns([8, 2])
+
+with profile_col:
+    with st.popover(
+        f"👤  {current_username}",
+        use_container_width=True
+    ):
+
+        st.markdown(
+            f'<div style="display:flex;align-items:center;gap:12px;padding:8px 4px 14px 4px;"><div style="width:48px;height:48px;border-radius:50%;background:#243746;color:white;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;">{html.escape(profile_initial)}</div><div><div style="font-size:15px;font-weight:700;color:#243746;">{html.escape(current_username)}</div><div style="font-size:12px;color:#68737b;margin-top:3px;">{html.escape(current_role_label)}</div></div></div>',
+            unsafe_allow_html=True
+        )
+
+        st.divider()
+
+        st.markdown("**👤 Profile**")
+        st.write(f"**Username:** {current_username}")
+        st.write(f"**Role:** {current_role_label}")
+
+        st.divider()
+
+        if st.button("🚪 Logout", key="profile_logout", use_container_width=True):
+            _logout()
 
 if st.session_state.sidebar_collapsed:
     st.markdown(
@@ -1393,12 +1544,17 @@ for section, items in NAV:
     sidebar_html += f'<div class="nav-section">{html.escape(section)}</div>'
     for icon, label in items:
         active = " active" if st.session_state.page == label else ""
+        nav_query = f"?page={quote(label)}"
+        if auth_token:
+            nav_query += f"&auth={quote(auth_token)}"
         sidebar_html += (
-            f'<a class="nav-link{active}" href="?page={html.escape(label)}">'
+            f'<a class="nav-link{active}" '
+            f'href="{html.escape(nav_query, quote=True)}" '
+            f'target="_self">'
             f'<span class="nav-icon">{icon}</span>'
             f'<span>{html.escape(label)}</span>'
             f'</a>'
-        )
+)
 
 sidebar_html += """
     <div class="sidebar-footer">
@@ -2374,8 +2530,24 @@ def _open_case_person(person_id, case_id=None):
         st.session_state.selected_case_id = str(case_id)
     st.rerun()
 
+def is_admin():
+    return st.session_state.get("role") == "Admin"
 
+
+def is_police():
+    return st.session_state.get("role") == "Police"
+
+
+def is_investigator():
+    return st.session_state.get("role") == "Investigator"
+
+
+def can_manage_cases():
+    return is_admin()
 def render_new_case_form():
+    if not is_admin():
+        st.error("Administrator access required.")
+        return
     """Interactive new-case form available directly from the Dashboard."""
     st.markdown("### Create New Case")
     st.caption("Add a case to the existing case register and optionally link its primary person. The data is written to data/raw/cases.csv and case_associations.csv.")
@@ -2436,9 +2608,406 @@ def render_new_case_form():
         st.rerun()
     except Exception as exc:
         st.error(f"Could not save the case: {exc}")
+def render_case_update_request():
+    st.markdown("### Request Case Update")
+    st.caption("Your request will be sent to an Administrator for review.")
 
+    with st.form("case_update_request_form", clear_on_submit=True):
+
+        request_type = st.selectbox(
+            "Request Type",
+            [
+                "Add New Case",
+                "Update Existing Case",
+                "Modify Case Information",
+                "Upload Evidence/File",
+            ],
+        )
+
+        case_id = st.text_input(
+            "Case ID",
+            placeholder="Example: C001"
+        )
+
+        reason = st.text_area(
+            "Reason for Request",
+            placeholder="Explain why this case needs to be added or updated..."
+        )
+
+        uploaded_file = st.file_uploader(
+            "Supporting File",
+            type=["pdf", "png", "jpg", "jpeg", "csv", "xlsx", "docx"],
+        )
+
+        submitted = st.form_submit_button(
+            "Send Request",
+            type="primary",
+            use_container_width=True
+        )
+
+    if submitted:
+
+        if not reason.strip():
+            st.error("Please enter the reason for the request.")
+            return
+
+        username = st.session_state.get("username", "Unknown")
+        role = st.session_state.get("role", "Unknown")
+
+        request = {
+            "request_id": f"REQ-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+            "requested_by": username,
+            "role": role,
+            "case_id": case_id.strip(),
+            "request_type": request_type,
+            "reason": reason.strip(),
+            "file_name": uploaded_file.name if uploaded_file else "",
+            "status": "PENDING",
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+
+        requests_file = PROCESSED_DIR / "case_update_requests.json"
+
+        try:
+            if requests_file.exists():
+                requests = json.loads(
+                    requests_file.read_text(encoding="utf-8")
+                )
+            else:
+                requests = []
+
+            requests.append(request)
+
+            requests_file.parent.mkdir(parents=True, exist_ok=True)
+
+            requests_file.write_text(
+                json.dumps(requests, indent=2),
+                encoding="utf-8"
+            )
+
+            st.success(
+                "Request sent successfully. Administrator will review it."
+            )
+
+            st.session_state.show_case_update_request = False
+            st.rerun()
+
+        except Exception as exc:
+            st.error(f"Could not submit request: {exc}")
+
+
+def render_admin_notifications():
+    if not is_admin():
+        return
+
+    requests_file = PROCESSED_DIR / "case_update_requests.json"
+
+    if not requests_file.exists():
+        return
+
+    try:
+        requests = json.loads(
+            requests_file.read_text(encoding="utf-8")
+        )
+    except Exception:
+        requests = []
+
+    pending = [
+        r for r in requests
+        if r.get("status") == "PENDING"
+    ]
+
+    if pending:
+        st.markdown("### 🔔 Case Update Requests")
+
+        st.warning(
+            f"You have {len(pending)} pending case update request(s)."
+        )
+
+        for request in pending:
+
+            with st.expander(
+                f"🔴 {request.get('request_id')} — "
+                f"{request.get('request_type')}"
+            ):
+
+                st.write(
+                    f"**Requested By:** {request.get('requested_by')}"
+                )
+
+                st.write(
+                    f"**Role:** {request.get('role')}"
+                )
+
+                st.write(
+                    f"**Case ID:** {request.get('case_id') or 'New Case'}"
+                )
+
+                st.write(
+                    f"**Reason:** {request.get('reason')}"
+                )
+
+                st.write(
+                    f"**Time:** {request.get('created_at')}"
+                )
+
+                c1, c2 = st.columns(2)
+
+                with c1:
+                    if st.button(
+                        "Approve",
+                        key=f"approve_{request['request_id']}"
+                    ):
+
+                        request["status"] = "APPROVED"
+                        request["reviewed_by"] = st.session_state.get(
+                            "username",
+                            "admin"
+                        )
+                        request["reviewed_at"] = datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        )
+
+                        requests_file.write_text(
+                            json.dumps(requests, indent=2),
+                            encoding="utf-8"
+                        )
+
+                        st.success("Request approved.")
+                        st.rerun()
+
+                with c2:
+                    if st.button(
+                        "Reject",
+                        key=f"reject_{request['request_id']}"
+                    ):
+
+                        request["status"] = "REJECTED"
+                        request["reviewed_by"] = st.session_state.get(
+                            "username",
+                            "admin"
+                        )
+                        request["reviewed_at"] = datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        )
+
+                        requests_file.write_text(
+                            json.dumps(requests, indent=2),
+                            encoding="utf-8"
+                        )
+
+                        st.warning("Request rejected.")
+                        st.rerun()
+
+
+# ============================================================
+# HELP & SUPPORT / COMPLAINT WORKFLOW
+# Police and Investigators can raise complaints; Admins review them.
+# ============================================================
+
+# Shared complaint database. When this Streamlit app is hosted on one machine/server,
+# every laptop connecting to that same app URL reads and writes the same SQLite DB.
+COMPLAINTS_DB = PROCESSED_DIR / "support_complaints.db"
+COMPLAINTS_FILE = PROCESSED_DIR / "support_complaints.json"  # legacy file, migrated automatically
+
+COMPLAINT_TYPES = [
+    "Case / FIR issue",
+    "Evidence / Forensic issue",
+    "CDR / Communication issue",
+    "Transaction / Financial issue",
+    "Surveillance issue",
+    "Location / Timeline issue",
+    "Network / Relationship issue",
+    "Data access / Missing records",
+    "Technical / System issue",
+    "Other",
+]
+
+def _init_complaints_db():
+    COMPLAINTS_DB.parent.mkdir(parents=True, exist_ok=True)
+    with sqlite3.connect(COMPLAINTS_DB, timeout=10) as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS complaints (
+                complaint_id TEXT PRIMARY KEY,
+                submitted_by TEXT NOT NULL,
+                role TEXT NOT NULL,
+                type TEXT NOT NULL,
+                related_case TEXT DEFAULT '',
+                priority TEXT NOT NULL,
+                complaint TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'PENDING',
+                created_at TEXT NOT NULL,
+                reviewed_by TEXT DEFAULT '',
+                reviewed_at TEXT DEFAULT '',
+                admin_note TEXT DEFAULT ''
+            )
+        """)
+        # One-time migration from the previous JSON complaint store.
+        if COMPLAINTS_FILE.exists():
+            try:
+                count = conn.execute("SELECT COUNT(*) FROM complaints").fetchone()[0]
+                if count == 0:
+                    data = json.loads(COMPLAINTS_FILE.read_text(encoding="utf-8"))
+                    if isinstance(data, list):
+                        for item in data:
+                            conn.execute(
+                                """INSERT OR IGNORE INTO complaints
+                                (complaint_id, submitted_by, role, type, related_case, priority, complaint, status, created_at, reviewed_by, reviewed_at, admin_note)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                                (item.get("complaint_id", ""), item.get("submitted_by", "user"),
+                                 item.get("role", "Police"), item.get("type", "Other"),
+                                 item.get("related_case", ""), item.get("priority", "Medium"),
+                                 item.get("complaint", ""), item.get("status", "PENDING"),
+                                 item.get("created_at", ""), item.get("reviewed_by", ""),
+                                 item.get("reviewed_at", ""), item.get("admin_note", ""))
+                            )
+            except Exception:
+                pass
+
+
+def _load_complaints():
+    try:
+        _init_complaints_db()
+        with sqlite3.connect(COMPLAINTS_DB, timeout=10) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("SELECT * FROM complaints ORDER BY created_at DESC").fetchall()
+            return [dict(row) for row in rows]
+    except Exception:
+        return []
+
+def _save_complaints(items):
+    _init_complaints_db()
+    with sqlite3.connect(COMPLAINTS_DB, timeout=10) as conn:
+        conn.execute("DELETE FROM complaints")
+        for item in items:
+            conn.execute(
+                """INSERT INTO complaints
+                (complaint_id, submitted_by, role, type, related_case, priority, complaint, status, created_at, reviewed_by, reviewed_at, admin_note)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (item.get("complaint_id", ""), item.get("submitted_by", "user"),
+                 item.get("role", "Police"), item.get("type", "Other"),
+                 item.get("related_case", ""), item.get("priority", "Medium"),
+                 item.get("complaint", ""), item.get("status", "PENDING"),
+                 item.get("created_at", ""), item.get("reviewed_by", ""),
+                 item.get("reviewed_at", ""), item.get("admin_note", ""))
+            )
+
+def render_help_support():
+    st.markdown(
+        '<div class="page-title-row"><div><div class="page-title">Help &amp; Support</div>'
+        '<div class="platform-label">Raise an operational complaint or report an issue to the administrator</div></div>'
+        '<div class="case-badge">SUPPORT</div></div>', unsafe_allow_html=True)
+
+    st.info("Use this section for case, evidence, intelligence-data, access, or technical issues. The administrator will review your complaint.")
+    complaints = _load_complaints()
+    username = st.session_state.get("username", "user")
+    role = st.session_state.get("role", "Police")
+
+    with st.form("raise_complaint_form", clear_on_submit=True):
+        complaint_type = st.selectbox("Complaint type", COMPLAINT_TYPES)
+        related_case = st.text_input("Related Case ID (optional)", placeholder="Example: C004")
+        priority = st.selectbox("Priority", ["Low", "Medium", "High", "Critical"], index=1)
+        complaint = st.text_area("Describe your complaint", placeholder="Type your complaint here...", height=150)
+        submitted = st.form_submit_button("Submit Complaint", type="primary", use_container_width=True)
+
+    if submitted:
+        if not complaint.strip():
+            st.error("Please enter your complaint before submitting.")
+        else:
+            complaint_id = f"CMP-{datetime.now().strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(2).upper()}"
+            complaints.append({
+                "complaint_id": complaint_id,
+                "submitted_by": username,
+                "role": role,
+                "type": complaint_type,
+                "related_case": related_case.strip(),
+                "priority": priority,
+                "complaint": complaint.strip(),
+                "status": "PENDING",
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "reviewed_by": "",
+                "reviewed_at": "",
+                "admin_note": "",
+            })
+            _save_complaints(complaints)
+            st.success(f"Complaint submitted successfully. Reference: {complaint_id}")
+            st.rerun()
+
+    mine = [c for c in complaints if c.get("submitted_by") == username]
+    if mine:
+        st.markdown("### My Complaints")
+        for c in reversed(mine):
+            status = c.get("status", "PENDING")
+            icon = "🟢" if status == "APPROVED" else "🔴" if status == "REJECTED" else "🟡"
+            with st.expander(f"{icon} {c.get('complaint_id')} — {c.get('type')} — {status}"):
+                st.write(f"**Priority:** {c.get('priority', 'Medium')}")
+                st.write(f"**Case:** {c.get('related_case') or 'Not specified'}")
+                st.write(f"**Submitted:** {c.get('created_at')}")
+                st.write(f"**Complaint:** {c.get('complaint')}")
+                if c.get("reviewed_by"):
+                    st.write(f"**Reviewed by:** {c.get('reviewed_by')}")
+                    st.write(f"**Admin response:** {c.get('admin_note') or 'No additional note.'}")
+
+def render_complaint_box():
+    if not is_admin():
+        st.error("Complaint Box is available only to administrators.")
+        return
+    st.markdown(
+        '<div class="page-title-row"><div><div class="page-title">Complaint Box</div>'
+        '<div class="platform-label">Review complaints raised by Police and Investigators</div></div>'
+        '<div class="case-badge">ADMIN REVIEW</div></div>', unsafe_allow_html=True)
+
+    complaints = _load_complaints()
+    refresh_col, _ = st.columns([1, 5])
+    with refresh_col:
+        if st.button("🔄 Refresh", key="refresh_complaints"):
+            st.rerun()
+    pending = [c for c in complaints if c.get("status") == "PENDING"]
+    st.metric("Pending Complaints", len(pending))
+
+    if not complaints:
+        st.success("No complaints have been submitted yet.")
+        return
+
+    for c in reversed(complaints):
+        status = c.get("status", "PENDING")
+        icon = "🟡" if status == "PENDING" else "🟢" if status == "APPROVED" else "🔴"
+        with st.expander(f"{icon} {c.get('complaint_id')} — {c.get('type')} — {status}"):
+            st.write(f"**Raised by:** {c.get('submitted_by')} ({c.get('role')})")
+            st.write(f"**Priority:** {c.get('priority', 'Medium')}")
+            st.write(f"**Related Case:** {c.get('related_case') or 'Not specified'}")
+            st.write(f"**Submitted:** {c.get('created_at')}")
+            st.write(f"**Complaint:** {c.get('complaint')}")
+
+            if status == "PENDING":
+                admin_note = st.text_area("Admin response / note (optional)", key=f"admin_note_{c['complaint_id']}", height=90)
+                col1, col2 = st.columns(2)
+                with col1:
+                    if st.button("Approve", key=f"approve_complaint_{c['complaint_id']}", type="primary", use_container_width=True):
+                        c["status"] = "APPROVED"
+                        c["reviewed_by"] = st.session_state.get("username", "admin")
+                        c["reviewed_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        c["admin_note"] = admin_note.strip()
+                        _save_complaints(complaints)
+                        st.success("Complaint approved.")
+                        st.rerun()
+                with col2:
+                    if st.button("Reject", key=f"reject_complaint_{c['complaint_id']}", use_container_width=True):
+                        c["status"] = "REJECTED"
+                        c["reviewed_by"] = st.session_state.get("username", "admin")
+                        c["reviewed_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        c["admin_note"] = admin_note.strip()
+                        _save_complaints(complaints)
+                        st.warning("Complaint rejected.")
+                        st.rerun()
+            else:
+                st.write(f"**Reviewed by:** {c.get('reviewed_by')}")
+                st.write(f"**Reviewed at:** {c.get('reviewed_at')}")
+                st.write(f"**Admin response:** {c.get('admin_note') or 'No additional note.'}")
 
 def render_dashboard():
+    if is_admin():
+        render_admin_notifications()
     st.markdown(
         """
         <div class="page-title-row">
@@ -2472,6 +3041,7 @@ def render_dashboard():
         """,
         unsafe_allow_html=True,
     )
+    
 
     kpi_cols = st.columns(6, gap="small")
     for col, (value, label) in zip(kpi_cols, cards):
@@ -2487,12 +3057,47 @@ def render_dashboard():
             )
 
     # Real interactive New Case control.
-    top_left, top_right = st.columns([1, 5])
-    with top_left:
-        if st.button("+ New Case", type="primary", use_container_width=True, key="dashboard_new_case"):
-            st.session_state.show_new_case_form = not st.session_state.get("show_new_case_form", False)
-    if st.session_state.get("show_new_case_form", False):
-        render_new_case_form()
+    # ============================================================
+# ROLE-BASED CASE ACTION
+# ============================================================
+
+top_left, top_right = st.columns([1, 5])
+
+with top_left:
+
+    if is_admin():
+
+        if st.button(
+            "+ New Case",
+            type="primary",
+            use_container_width=True,
+            key="dashboard_new_case"
+        ):
+            st.session_state.show_new_case_form = not st.session_state.get(
+                "show_new_case_form", False
+            )
+
+    elif is_police() or is_investigator():
+
+        if st.button(
+            "📝 Request Case Update",
+            type="primary",
+            use_container_width=True,
+            key="dashboard_request_case_update"
+        ):
+            st.session_state.show_case_update_request = not st.session_state.get(
+                "show_case_update_request", False
+            )
+
+# Admin sees the actual case creation form
+if is_admin() and st.session_state.get("show_new_case_form", False):
+    render_new_case_form()
+
+# Police / Investigator see request form
+if (is_police() or is_investigator()) and st.session_state.get(
+    "show_case_update_request", False
+):
+    render_case_update_request()
 
     st.markdown(
         """
@@ -2558,16 +3163,208 @@ def render_dashboard():
     )
 
 
+def _case_row(case_id):
+    """Return a copy of one case row by case_id."""
+    if cases.empty or "case_id" not in cases.columns:
+        return None
+    matches = cases[cases["case_id"].astype(str).eq(str(case_id))]
+    if matches.empty:
+        return None
+    return matches.iloc[0].copy()
+
+
+def _case_primary_info(case_id):
+    """Return the first linked person and relationship for a case."""
+    if case_assoc.empty or not {"case_id", "person_id"}.issubset(case_assoc.columns):
+        return "—", "—"
+    rows = case_assoc[case_assoc["case_id"].astype(str).eq(str(case_id))]
+    rows = rows[rows["person_id"].notna() & rows["person_id"].astype(str).ne("")]
+    if rows.empty:
+        return "—", "—"
+    row = rows.iloc[0]
+    return str(row.get("person_id", "—")), str(row.get("relationship", "Associated"))
+
+
+def _save_case_changes(case_id, values):
+    """Update the selected case in the source CSV and refresh cached data."""
+    path = FILES["cases"]
+    current = pd.read_csv(path) if path.exists() else pd.DataFrame()
+    if current.empty or "case_id" not in current.columns:
+        raise ValueError("Case register is empty or missing the case_id column.")
+
+    mask = current["case_id"].astype(str).eq(str(case_id))
+    if not mask.any():
+        raise ValueError(f"Case {case_id} was not found.")
+
+    for col in current.columns:
+        if col in values:
+            current.loc[mask, col] = values[col]
+    current.to_csv(path, index=False)
+    read_csv.clear()
+
+
+def _delete_case(case_id):
+    """Delete a case and all of its case-association rows."""
+    cases_path = FILES["cases"]
+    assoc_path = FILES["case_assoc"]
+
+    current_cases = pd.read_csv(cases_path) if cases_path.exists() else pd.DataFrame()
+    if current_cases.empty or "case_id" not in current_cases.columns:
+        raise ValueError("Case register is empty or missing the case_id column.")
+
+    case_mask = current_cases["case_id"].astype(str).eq(str(case_id))
+    if not case_mask.any():
+        raise ValueError(f"Case {case_id} was not found.")
+    current_cases = current_cases.loc[~case_mask].copy()
+    current_cases.to_csv(cases_path, index=False)
+
+    if assoc_path.exists():
+        current_assoc = pd.read_csv(assoc_path)
+        if "case_id" in current_assoc.columns:
+            current_assoc = current_assoc.loc[
+                ~current_assoc["case_id"].astype(str).eq(str(case_id))
+            ].copy()
+            current_assoc.to_csv(assoc_path, index=False)
+
+    read_csv.clear()
+
+
+def render_case_details(case_id):
+    """Display a full case detail view with Admin edit/delete controls."""
+    row = _case_row(case_id)
+    if row is None:
+        st.error(f"Case {case_id} was not found.")
+        st.session_state.pop("selected_case_id", None)
+        return
+
+    case_id = str(case_id)
+    person_id, relationship = _case_primary_info(case_id)
+    score = score_for_person(person_id) if person_id != "—" else 0
+    status = score_range(score) if person_id != "—" else "OPEN"
+
+    st.markdown(
+        f'<div class="page-title-row"><div class="page-title">Case Details — {html.escape(case_id)}</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.caption("Detailed information for the selected investigation case.")
+
+    details = [
+        ("Case ID", row.get("case_id", "—")),
+        ("FIR Number", row.get("fir_number", "—")),
+        ("Crime Type", row.get("crime_type", row.get("title", "—"))),
+        ("Case Date", row.get("case_date", "—")),
+        ("Location ID", row.get("location_id", "—")),
+        ("Primary Person", person_id),
+        ("Relationship", relationship),
+        ("Investigation Score", f"{score:.1f}"),
+        ("Status", status),
+    ]
+
+    detail_cols = st.columns(3)
+    for i, (label, value) in enumerate(details):
+        with detail_cols[i % 3]:
+            st.markdown(
+                f'<div class="case-detail-card"><div class="case-detail-label">{html.escape(str(label))}</div><div class="case-detail-value">{html.escape(str(value))}</div></div>',
+                unsafe_allow_html=True,
+            )
+
+    st.markdown("### Case Actions")
+    action_cols = st.columns([1, 1, 4])
+    with action_cols[0]:
+        edit_clicked = st.button(
+            "✏️ Edit",
+            type="primary",
+            use_container_width=True,
+            disabled=not is_admin(),
+            key=f"case_edit_{case_id}",
+        )
+    with action_cols[1]:
+        delete_clicked = st.button(
+            "🗑️ Delete",
+            type="secondary",
+            use_container_width=True,
+            disabled=not is_admin(),
+            key=f"case_delete_{case_id}",
+        )
+    if not is_admin():
+        st.caption("Edit and Delete are available to Administrator accounts only.")
+
+    if edit_clicked:
+        st.session_state[f"editing_case_{case_id}"] = True
+    if delete_clicked:
+        st.session_state[f"confirm_delete_case_{case_id}"] = True
+
+    if st.session_state.get(f"confirm_delete_case_{case_id}", False):
+        st.warning(f"Are you sure you want to permanently delete case {case_id}? Its case-association records will also be removed.")
+        confirm_cols = st.columns([1, 1, 4])
+        with confirm_cols[0]:
+            if st.button("Yes, Delete", type="primary", key=f"confirm_yes_{case_id}", use_container_width=True):
+                try:
+                    _delete_case(case_id)
+                    st.session_state.pop(f"confirm_delete_case_{case_id}", None)
+                    st.session_state.pop(f"editing_case_{case_id}", None)
+                    st.session_state.pop("selected_case_id", None)
+                    st.success(f"Case {case_id} deleted successfully.")
+                    st.rerun()
+                except Exception as exc:
+                    st.error(f"Could not delete case: {exc}")
+        with confirm_cols[1]:
+            if st.button("Cancel", key=f"confirm_cancel_{case_id}", use_container_width=True):
+                st.session_state.pop(f"confirm_delete_case_{case_id}", None)
+                st.rerun()
+
+    if st.session_state.get(f"editing_case_{case_id}", False):
+        st.markdown("### Edit Case")
+        with st.form(f"edit_case_form_{case_id}"):
+            c1, c2 = st.columns(2)
+            with c1:
+                edit_fir = st.text_input("FIR Number", value=str(row.get("fir_number", "")))
+                edit_crime = st.text_input("Crime Type", value=str(row.get("crime_type", row.get("title", ""))))
+            with c2:
+                edit_date = st.text_input("Case Date", value=str(row.get("case_date", "")))
+                edit_location = st.text_input("Location ID", value=str(row.get("location_id", "")))
+            save_clicked = st.form_submit_button("Save Changes", type="primary", use_container_width=True)
+
+        if save_clicked:
+            try:
+                _save_case_changes(
+                    case_id,
+                    {
+                        "fir_number": edit_fir.strip(),
+                        "crime_type": edit_crime.strip() or "Investigation",
+                        "case_date": edit_date.strip(),
+                        "location_id": edit_location.strip(),
+                    },
+                )
+                st.session_state.pop(f"editing_case_{case_id}", None)
+                st.success(f"Case {case_id} updated successfully.")
+                st.rerun()
+            except Exception as exc:
+                st.error(f"Could not update the case: {exc}")
+
+    if st.button("← Back to Cases", key=f"back_cases_{case_id}"):
+        st.session_state.pop("selected_case_id", None)
+        st.rerun()
+
+
 def render_cases():
     st.markdown(
         '<div class="page-title-row"><div class="page-title">Cases</div></div>',
         unsafe_allow_html=True,
     )
+    if is_admin():
+        st.success("Administrator Mode — You have full case management access.")
+    else:
+        st.info("Read-only investigation view. Use 'Request Case Update' to request changes.")
 
     if "selected_case_id" in st.session_state:
         selected_case_id = str(st.session_state.selected_case_id)
     else:
         selected_case_id = ""
+
+    if selected_case_id:
+        render_case_details(selected_case_id)
+        return
 
     if cases.empty:
         st.info("No case dataset was found. Use the Dashboard → + New Case button to create a case.")
@@ -2601,13 +3398,9 @@ def render_cases():
         cols[3].write(person if person != "—" else "Not linked")
         cols[4].write(f"{score:.1f}")
         with cols[5]:
-            if person != "—" and person in persons:
-                if st.button("View", key=f"cases_view_{case_id}_{idx}", use_container_width=True):
-                    _open_case_person(person, case_id)
-            else:
-                if st.button("View Case", key=f"cases_view_only_{case_id}_{idx}", use_container_width=True):
-                    st.session_state.selected_case_id = case_id
-                    st.info(f"Case {case_id} has no linked primary person. Add an association in the case data to open Individual Investigation.")
+            if st.button("View", key=f"cases_view_{case_id}_{idx}", use_container_width=True):
+                st.session_state.selected_case_id = case_id
+                st.rerun()
 
     st.markdown("### Case Register")
     st.dataframe(cases, use_container_width=True, hide_index=True)
@@ -2873,6 +3666,135 @@ def render_evidence():
 
     render_biometric_intelligence()
 
+
+# ============================================================
+# REPORT CONTEXT / INTELLIGENCE REPORT HELPERS
+# ============================================================
+
+def _safe_int(value):
+    try:
+        return int(value)
+    except Exception:
+        return 0
+
+def _report_dataset_summary(df):
+    """Return a JSON-safe summary for the report workspace."""
+    if df is None or getattr(df, "empty", True):
+        return {"records": 0, "columns": [], "sample": []}
+    sample = []
+    try:
+        sample = df.head(5).replace({np.nan: None}).to_dict(orient="records")
+    except Exception:
+        sample = []
+    # Convert numpy/pandas scalar values to native Python values.
+    def native(v):
+        if isinstance(v, dict):
+            return {str(k): native(x) for k, x in v.items()}
+        if isinstance(v, (list, tuple)):
+            return [native(x) for x in v]
+        if hasattr(v, "item"):
+            try:
+                return v.item()
+            except Exception:
+                pass
+        return v
+    return {
+        "records": int(len(df)),
+        "columns": [str(c) for c in df.columns.tolist()],
+        "sample": native(sample),
+    }
+
+def build_llm_report_context():
+    """
+    Build a compact, JSON-safe analytical context from CrimeSphere datasets.
+    This function is intentionally local and deterministic so Reports works
+    even when no external LLM/API is configured.
+    """
+    datasets = {
+        "cases": cases,
+        "cdr_records": cdr,
+        "transactions": transactions,
+        "locations": locations,
+        "case_associations": case_assoc,
+        "forensic": forensic,
+        "investigative_assessment": assessment,
+        "persons": persons_master,
+        "phones": phones,
+        "vehicles": vehicles,
+        "vehicle_events": vehicle_events,
+        "bank_accounts": bank_accounts,
+        "devices": devices,
+        "surveillance": surveillance,
+        "organizations": organizations,
+    }
+
+    context = {
+        "project": "CrimeSphere AI",
+        "purpose": "Investigation intelligence and criminal network analysis",
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "network": {
+            "nodes": int(G.number_of_nodes()) if G is not None else 0,
+            "relationships": int(G.number_of_edges()) if G is not None else 0,
+        },
+        "datasets": {name: _report_dataset_summary(df) for name, df in datasets.items()},
+    }
+
+    # Add the most useful high-level assessment information when available.
+    if assessment is not None and not assessment.empty:
+        context["assessment"] = _report_dataset_summary(assessment)
+
+    return context
+
+def generate_intelligence_report(focus="overall criminal network and cross-source evidence"):
+    """
+    Generate a deterministic investigation report from the local datasets.
+    Returns (report_text, source_label), matching render_reports_ai().
+    """
+    context = build_llm_report_context()
+    ds = context["datasets"]
+    network = context["network"]
+
+    def count(name):
+        return ds.get(name, {}).get("records", 0)
+
+    lines = [
+        "CRIMESPHERE AI — INVESTIGATION INTELLIGENCE REPORT",
+        "=" * 56,
+        f"Report focus: {focus.strip() or 'overall criminal network and cross-source evidence'}",
+        f"Generated: {context['generated_at']}",
+        "",
+        "1. EXECUTIVE OVERVIEW",
+        f"CrimeSphere AI currently contains {count('cases')} case records and "
+        f"{count('persons')} person records, with {network['nodes']} network nodes "
+        f"and {network['relationships']} relationships available for analysis.",
+        "",
+        "2. CROSS-SOURCE COVERAGE",
+        f"- CDR records: {count('cdr_records')}",
+        f"- Financial transactions: {count('transactions')}",
+        f"- Location events: {count('locations')}",
+        f"- Case associations: {count('case_associations')}",
+        f"- Forensic records: {count('forensic')}",
+        f"- Surveillance events: {count('surveillance')}",
+        f"- Vehicle events: {count('vehicle_events')}",
+        "",
+        "3. NETWORK ANALYSIS",
+        "The network represents relationships between entities derived from the "
+        "available investigation datasets. Network connections should be used to "
+        "identify relationships and prioritize investigative review, not as a "
+        "standalone determination of guilt.",
+        "",
+        "4. INVESTIGATIVE USE",
+        "Investigators can correlate case, communication, financial, location, "
+        "vehicle, surveillance and forensic information to identify patterns and "
+        "connections that may require further examination.",
+        "",
+        "5. CAUTION",
+        "This report summarizes available data and analytical indicators. It is "
+        "not a legal conclusion, proof of guilt, or a substitute for investigator "
+        "judgment and verification of source evidence.",
+    ]
+    return "\n".join(lines), "Local CrimeSphere analytical report"
+
 # ============================================================
 # AI INTELLIGENCE REPORTS
 # ============================================================
@@ -2888,7 +3810,66 @@ def render_reports_ai():
         st.text_area("Generated report", report, height=420)
         st.download_button("Download report", report, file_name="crimesphere_intelligence_report.txt", mime="text/plain")
     st.markdown("### Current Analytical Coverage")
-    st.json(build_llm_report_context())
+    coverage = build_llm_report_context()
+    network = coverage.get("network", {})
+    datasets = coverage.get("datasets", {})
+
+    # Investigator-friendly coverage summary — technical JSON is kept hidden below.
+    metric_items = [
+        ("Cases", datasets.get("cases", {}).get("records", 0)),
+        ("Persons", datasets.get("persons", {}).get("records", 0)),
+        ("Network Nodes", network.get("nodes", 0)),
+        ("Relationships", network.get("relationships", 0)),
+        ("CDR Records", datasets.get("cdr_records", {}).get("records", 0)),
+        ("Transactions", datasets.get("transactions", {}).get("records", 0)),
+    ]
+    cols = st.columns(3)
+    for i, (label, value) in enumerate(metric_items):
+        with cols[i % 3]:
+            st.metric(label, f"{int(value):,}")
+
+    st.markdown("#### Data Sources")
+    source_items = [
+        ("Cases", "cases"),
+        ("Communication / CDR", "cdr_records"),
+        ("Financial Transactions", "transactions"),
+        ("Location Events", "locations"),
+        ("Case Associations", "case_associations"),
+        ("Forensic Evidence", "forensic"),
+        ("Surveillance", "surveillance"),
+        ("Vehicle Events", "vehicle_events"),
+    ]
+    source_cols = st.columns(2)
+    # Two intentionally highlighted sources demonstrate that the dashboard
+    # can surface data-quality/availability attention items.
+    attention_sources = {"Forensic Evidence", "Surveillance"}
+    for i, (label, key) in enumerate(source_items):
+        records = datasets.get(key, {}).get("records", 0)
+        with source_cols[i % 2]:
+            if records:
+                if label in attention_sources:
+                    st.markdown(
+                        f'<div class="data-source-card data-source-warning"><span>⚠ {html.escape(label)} — {int(records):,} records</span><small>Attention required</small></div>',
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.markdown(
+                        f'<div class="data-source-card data-source-ok"><span>✓ {html.escape(label)} — {int(records):,} records</span><small>Available</small></div>',
+                        unsafe_allow_html=True,
+                    )
+            else:
+                st.markdown(
+                    f'<div class="data-source-card data-source-empty"><span>○ {html.escape(label)} — No records available</span><small>Unavailable</small></div>',
+                    unsafe_allow_html=True,
+                )
+
+    st.caption(
+        "Coverage reflects the records currently loaded into CrimeSphere AI. "
+        "These figures describe available analytical data and do not indicate guilt."
+    )
+
+    with st.expander("Technical Details", expanded=False):
+        st.json(coverage)
 
 # ============================================================
 # ADMIN — USER MANAGEMENT
@@ -2975,7 +3956,8 @@ def render_settings():
             "Timeline",
             "Evidence",
         ],
-        "SYSTEM": ["Reports", "Settings"],
+        "SYSTEM": ["Reports", "Complaint Box", "Settings"],
+        "SUPPORT": ["Help & Support"],
     }
 
     for group, features in feature_groups.items():
@@ -3467,6 +4449,10 @@ elif page == "Evidence":
     render_evidence()
 elif page == "Reports":
     render_reports_ai()
+elif page == "Help & Support":
+    render_help_support()
+elif page == "Complaint Box":
+    render_complaint_box()
 elif page == "Settings":
     render_settings()
 else:
