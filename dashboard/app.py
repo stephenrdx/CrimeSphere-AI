@@ -85,14 +85,14 @@ ROLE_PAGES = {
     "Police": [
         "Dashboard", "Cases", "FIR Intelligence", "Historical Cases",
         "CDR Intelligence", "Transactions", "Surveillance",
-        "Individual Investigation", "Network Explorer", "Relationships",
-        "Timeline", "Evidence", "Reports", "Help & Support"
+        "Reports", "Help & Support"
     ],
     "Investigator": [
         "Dashboard", "Cases", "FIR Intelligence", "Historical Cases",
         "CDR Intelligence", "Transactions", "Surveillance",
         "Individual Investigation", "Network Explorer", "Relationships",
-        "Timeline", "Evidence", "Reports", "Help & Support"
+        "Timeline", "Evidence",
+        "Reports", "Help & Support"
     ],
 }
 
@@ -3840,21 +3840,41 @@ def render_reports_ai():
         ("Vehicle Events", "vehicle_events"),
     ]
     source_cols = st.columns(2)
-    # Two intentionally highlighted sources demonstrate that the dashboard
-    # can surface data-quality/availability attention items.
-    attention_sources = {"Forensic Evidence", "Surveillance"}
+
+    # Data-quality status is calculated from the actual source data instead of
+    # hard-coding particular sources as red. A source is marked for attention
+    # when its records contain domain-specific items that require review.
+    def source_attention(label, key):
+        raw_dir = BASE_DIR / "data" / "raw"
+        if key == "forensic":
+            path = raw_dir / "forensic_fingerprint_reports.csv"
+            if path.exists():
+                df = pd.read_csv(path)
+                review = df["match_status"].astype(str).str.strip().isin(
+                    {"Pending Examiner Review", "Insufficient Quality"}
+                ).sum()
+                return int(review), "records require examiner review"
+        elif key == "surveillance":
+            path = raw_dir / "surveillance_events.csv"
+            if path.exists():
+                df = pd.read_csv(path)
+                review = df["observation"].astype(str).str.strip().eq("Unknown activity").sum()
+                return int(review), "records contain unknown activity"
+        return 0, ""
+
     for i, (label, key) in enumerate(source_items):
         records = datasets.get(key, {}).get("records", 0)
         with source_cols[i % 2]:
             if records:
-                if label in attention_sources:
+                attention_count, attention_reason = source_attention(label, key)
+                if attention_count:
                     st.markdown(
-                        f'<div class="data-source-card data-source-warning"><span>⚠ {html.escape(label)} — {int(records):,} records</span><small>Attention required</small></div>',
+                        f'<div class="data-source-card data-source-warning"><span>⚠ {html.escape(label)} — {int(records):,} records</span><small>Attention required: {attention_count:,} {html.escape(attention_reason)}</small></div>',
                         unsafe_allow_html=True,
                     )
                 else:
                     st.markdown(
-                        f'<div class="data-source-card data-source-ok"><span>✓ {html.escape(label)} — {int(records):,} records</span><small>Available</small></div>',
+                        f'<div class="data-source-card data-source-ok"><span>✓ {html.escape(label)} — {int(records):,} records</span><small>Available — no data-quality issues detected</small></div>',
                         unsafe_allow_html=True,
                     )
             else:
@@ -3867,9 +3887,6 @@ def render_reports_ai():
         "Coverage reflects the records currently loaded into CrimeSphere AI. "
         "These figures describe available analytical data and do not indicate guilt."
     )
-
-    with st.expander("Technical Details", expanded=False):
-        st.json(coverage)
 
 # ============================================================
 # ADMIN — USER MANAGEMENT
